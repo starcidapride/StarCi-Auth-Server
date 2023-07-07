@@ -8,6 +8,7 @@ export const databaseProviders = [
         useFactory: (): Promise<typeof mongoose> =>
             mongoose.connect(databaseConfig().databaseUri)
                 .then(() => {
+                    console.log('Connect to database successfully')
                     return mongoose
                 })
                 .catch((error) => {
