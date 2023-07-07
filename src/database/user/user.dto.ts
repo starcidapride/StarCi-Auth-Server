@@ -1,4 +1,6 @@
-export class UserDTO {
+import { Document } from 'mongoose'
+
+export class UserDTO extends Document {
     readonly email: string
     readonly password: string
     readonly username?: string

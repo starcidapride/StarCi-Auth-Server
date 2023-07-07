@@ -10,7 +10,7 @@ export type AuthTokenSet =  {
 
 export type PresentableUser = {
     email: string,
-    username: string,
+    username?: string,
     image?: string,
     bio?: string,
     firstName: string,
