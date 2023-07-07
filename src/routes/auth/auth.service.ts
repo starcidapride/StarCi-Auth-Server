@@ -1,9 +1,11 @@
 import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common'
-// import { CryptoService } from '@utils/sha256.service'
+import { CryptoService } from '@utils/sha256.service'
 // import { UserDbService } from '@database/user.db.service'
-// import jwtConfig from '@config/jwt.config'
-// import { JwtService } from '@nestjs/jwt'
-// import { AuthTokenSet, Payload, PresentableUser, SignInResponse, SignUpRequest, VerifyResponse } from '@apptypes/auth.type'
+import jwtConfig from '@config/jwt.config'
+import { JwtService } from '@nestjs/jwt'
+import { AuthTokenSet, Payload, PresentableUser, SignInResponse, SignUpRequest, VerifyResponse } from '@apptypes/auth.type'
+import { UserService } from '@database/user/user.service'
+import { UserDTO } from '@database/user/user.dto'
 // import { MailerService } from '@routes/auth/mailer/mailer.service'
 // import {TokenExpiredError} from 'jsonwebtoken'
 
@@ -11,62 +13,65 @@ import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@n
 @Injectable()
 export class AuthService {
     constructor(
-        // private readonly jwtService: JwtService,
+        private readonly jwtService: JwtService,
+        private readonly userService: UserService,
         //private readonly mailerService: MailerService,
-        //private readonly cryptoService: CryptoService
+        private readonly cryptoService: CryptoService
     ) { }
 	
-    // async validateUser(email: string, password: string): Promise<User> {
-    // 	const hashedPassword = this.cryptoService.createHashSHA256(password)
-    // 	const user = await this.userDbService.getUser(
-    // 		{
-    // 			email,
-    // 			password : hashedPassword
-    // 		}
-    // 	)
-    // 	if (!user) {
-    // 		throw new UnauthorizedException('Incorrect username or password.')
-    // 	}
-    // 	return user
-    // }
+    async validateUser(email: string, password: string): Promise<UserDTO> {
+    	const hashedPassword = this.cryptoService.createHashSHA256(password)
+    	const user = await this.userService.findOne(
+    		{
+    			email,
+    			// password : hashedPassword
+                password
+    		}
+    	)
+        console.log(user)
+    	if (!user) {
+    		throw new UnauthorizedException('Incorrect username or password.')
+    	}
+    	return user
+    }
 
-    // private async generateAuthTokenSet(email: string): Promise<AuthTokenSet> {
-    // 	const payload = { email }
-    // 	const accessToken = await this.jwtService.signAsync(payload, {
-    // 		expiresIn: jwtConfig().accessTokenExpiryTime,
-    // 		secret: jwtConfig().secret,
-    // 	})
+    private async generateAuthTokenSet(email: string): Promise<AuthTokenSet> {
+    	const payload = { email }
+    	const accessToken = await this.jwtService.signAsync(payload, {
+    		expiresIn: jwtConfig().accessTokenExpiryTime,
+    		secret: jwtConfig().secret,
+    	})
 
-    // 	const refreshToken = await this.jwtService.signAsync(payload, {
-    // 		expiresIn: jwtConfig().refreshTokenExpiryTime,
-    // 		secret: jwtConfig().secret,
-    // 	})
+    	const refreshToken = await this.jwtService.signAsync(payload, {
+    		expiresIn: jwtConfig().refreshTokenExpiryTime,
+    		secret: jwtConfig().secret,
+    	})
 
-    // 	return { accessToken, refreshToken }
-    // }
+    	return { accessToken, refreshToken }
+    }
   
-    // async processSignIn(user: User): Promise<SignInResponse> {
-    // 	const authTokenSet = await this.generateAuthTokenSet(user.email)
+    async processSignIn(user: UserDTO): Promise<SignInResponse> {
+    	const authTokenSet = await this.generateAuthTokenSet(user.email)
 
-    // 	if (!user.verified) {
-    // 		throw new UnauthorizedException('Prior to continuing, it\'s important that you verify your account through your email. Furthermore, we have sent you another email as a backup option in case you have misplaced or cannot locate the initial email.')
-    // 	}
-    // 	const presentableUser : PresentableUser = {
-    // 		email: user.email,
-    // 		username: user.username,
-    // 		...(user.image && { image: user.image }),
-    // 		...(user.bio && { bio: user.bio }),
-    // 		firstName: user.firstName,
-    // 		lastName: user.lastName
-    // 	}
+    	if (!user.verified) {
+    		throw new UnauthorizedException('Prior to continuing, it\'s important that you verify your account through your email. Furthermore, we have sent you another email as a backup option in case you have misplaced or cannot locate the initial email.')
+    	}
+    	const presentableUser : PresentableUser = {
+    		email: user.email,
+    		username: user.username,
+    		...(user.picture && { picture: user.picture }),
+    		...(user.bio && { bio: user.bio }),
+    		firstName: user.firstName,
+    		lastName: user.lastName
+    	}
+    
+    	//await this.refreshTokenDbService.addToken({email: user.email, token: authTokenSet.refreshToken })
 
-    // 	await this.refreshTokenDbService.addToken({email: user.email, token: authTokenSet.refreshToken })
-
-    // 	return { authTokenSet, presentableUser }
-    // }
+    	return { authTokenSet, presentableUser }
+    }
 
     // async processSignUp(data: SignUpRequest): Promise<PresentableUser> {
-    // 	const { email, password, username, firstName, lastName } = data
+    // const { email, password, username, firstName, lastName } = data
 
     // 	const hashedPassword = this.cryptoService.createHashSHA256(password)
     // 	const user = {

@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Post, Query, Res, UseGuards, UseInterceptors, Headers } from '@nestjs/common'
-// import { LocalAuthGuard } from '@routes/auth/guards/local.guard'
-// import { AuthService } from '@routes/auth/auth.service'
-// import { AuthTokenSet, PresentableUser, SignInResponse, SignUpRequest } from '@apptypes/auth.type'
-// import { UserDecorator } from '@decorators/user.decorator'
-// import { User } from '@prisma/client'
+import { LocalAuthGuard } from '@routes/auth/guards/local.guard'
+import { AuthService } from '@routes/auth/auth.service'
+import { UserDTO } from '@database/user/user.dto'
+import { UserDecorator } from '@decorators/user.decorator'
+import { AuthTokenSet, PresentableUser, SignInResponse, SignUpRequest } from '@apptypes/auth.type'
 // import { SignUpInterceptor } from '@routes/auth/interceptors/sign-up.interceptor'
 // import { SignUpGuard } from '@routes/auth/guards/sign-up.guard'
 // import { JwtAuthGuard } from '@routes/auth/guards/jwt.guard'
@@ -12,15 +12,15 @@ import { Body, Controller, Get, Post, Query, Res, UseGuards, UseInterceptors, He
 
 @Controller('api/auth')
 export class AuthController {
-    // constructor(
-    //     private readonly authService: AuthService,
-    // ) { }
+    constructor(
+        private readonly authService: AuthService,
+    ) { }
 
-    // @UseGuards(LocalAuthGuard)
-    // @Post('sign-in')
-    // async handleSignIn(@UserDecorator() user: User): Promise<SignInResponse> {
-    // 	return await this.authService.processSignIn(user)
-    // }
+    @UseGuards(LocalAuthGuard)
+    @Post('sign-in')
+    async handleSignIn(@UserDecorator() user: UserDTO): Promise<SignInResponse> {
+    	return await this.authService.processSignIn(user)
+    }
 
     // @UseGuards(SignUpGuard)
     // @UseInterceptors(SignUpInterceptor)
@@ -61,5 +61,5 @@ export class AuthController {
     async handleHello(){
     	return {hello: 'world'}
     }
-
 }
+
