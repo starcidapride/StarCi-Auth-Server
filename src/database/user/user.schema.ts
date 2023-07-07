@@ -42,4 +42,4 @@ export const UserSchema = new mongoose.Schema({
         require: true
     }
 
-})
+}, { collection: 'User' })

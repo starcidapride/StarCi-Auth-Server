@@ -28,7 +28,6 @@ export class AuthService {
                 password
     		}
     	)
-        console.log(user)
     	if (!user) {
     		throw new UnauthorizedException('Incorrect username or password.')
     	}
