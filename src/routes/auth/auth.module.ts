@@ -10,6 +10,7 @@ import { LocalStrategy } from '@routes/auth/strategies/local.strategy'
 import { refreshTokenProviders } from '@database/refreshToken/refresh-token.provider'
 import { RefreshTokenService } from '@database/refreshToken/refresh-token.service'
 import { MailerService } from './mailer/mailer.service'
+import { JwtStrategy } from './strategies/jwt.strategy'
 
 // import { MailerService } from './mailer/mailer.service'
 
@@ -21,6 +22,7 @@ import { MailerService } from './mailer/mailer.service'
         UserService,
         JwtService,
         LocalStrategy,
+        JwtStrategy,
         RefreshTokenService,
         MailerService,
 

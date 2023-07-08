@@ -9,8 +9,6 @@ import { UserDTO } from '@database/user/user.dto'
 import { RefreshTokenService } from '@database/refreshToken/refresh-token.service'
 import { MailerService } from '@routes/auth/mailer/mailer.service'
 import {TokenExpiredError} from 'jsonwebtoken'
-import { RefreshTokenDTO } from '@database/refreshToken/refresh-token.dto'
-
 
 @Injectable()
 export class AuthService {
