@@ -3,13 +3,14 @@ import { LocalAuthGuard } from '@routes/auth/guards/local.guard'
 import { AuthService } from '@routes/auth/auth.service'
 import { UserDTO } from '@database/user/user.dto'
 import { UserDecorator } from '@decorators/user.decorator'
-import { AuthTokenSet, PresentableUser, SignInBodyApi, SignInResponse, SignUpRequest, SignUpRequestApi } from '@apptypes/auth.type'
+import { AuthTokenSet, PresentableUser, SignInResponse, SignUpRequest } from '@apptypes/auth.type'
 import { SignUpInterceptor } from '@routes/auth/interceptors/sign-up.interceptor'
 import { SignUpGuard } from '@routes/auth/guards/sign-up.guard'
 import { JwtAuthGuard } from '@routes/auth/guards/jwt.guard'
 import { Response } from 'express' 
 import { RefreshGuard } from '@routes/auth/guards/refresh.guard'
-import { ApiBearerAuth, ApiBody, ApiParam, ApiParamOptions, ApiProperty, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger'
+import { SignInBodyApi, SignUpRequestApi } from '@routes/auth/swagger/auth.property'
 
 @ApiTags('Authentication')
 @Controller('api/auth')
