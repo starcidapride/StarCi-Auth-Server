@@ -20,7 +20,10 @@ async function bootstrap() {
         .build()
     const document = SwaggerModule.createDocument(app, config)
 
-    SwaggerModule.setup('/', app, document)
+    SwaggerModule.setup('/', app, document, {
+        swaggerOptions: { defaultModelsExpandDepth: -1 }
+    })
+    
     app.use(json({limit: '50mb'}))
     await app.listen(serverConfig().port || 3000)
 
