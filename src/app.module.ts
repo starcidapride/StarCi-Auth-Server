@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common'
-import { AppController } from './app.controller'
-import { AppService } from './app.service'
 import { AuthModule } from '@routes/auth/auth.module'
 import { ConfigModule } from '@nestjs/config'
 import cryptoConfig from '@config/crypto.config'
@@ -20,7 +18,7 @@ import databaseConfig from '@config/database.config'
                 serverConfig
             ]}),
         AuthModule],
-    controllers: [AppController],
-    providers: [AppService],
+    controllers: [],
+    providers: [],
 })
 export class AppModule {}
