@@ -6,8 +6,10 @@ import { JwtService } from '@nestjs/jwt'
 import { AuthTokenSet, Payload, PresentableUser, SignInResponse, SignUpRequest, VerifyResponse } from '@apptypes/auth.type'
 import { UserService } from '@database/user/user.service'
 import { UserDTO } from '@database/user/user.dto'
-// import { MailerService } from '@routes/auth/mailer/mailer.service'
-// import {TokenExpiredError} from 'jsonwebtoken'
+import { RefreshTokenService } from '@database/refreshToken/refresh-token.service'
+import { MailerService } from '@routes/auth/mailer/mailer.service'
+import {TokenExpiredError} from 'jsonwebtoken'
+import { RefreshTokenDTO } from '@database/refreshToken/refresh-token.dto'
 
 
 @Injectable()
@@ -15,7 +17,8 @@ export class AuthService {
     constructor(
         private readonly jwtService: JwtService,
         private readonly userService: UserService,
-        //private readonly mailerService: MailerService,
+        private readonly refreshTokenService: RefreshTokenService,
+        private readonly mailerService: MailerService,
         private readonly cryptoService: CryptoService
     ) { }
 	
@@ -24,8 +27,7 @@ export class AuthService {
     	const user = await this.userService.findOne(
     		{
     			email,
-    			// password : hashedPassword
-                password
+    			password : hashedPassword
     		}
     	)
     	if (!user) {
@@ -62,96 +64,101 @@ export class AuthService {
     		firstName: user.firstName,
     		lastName: user.lastName
     	}
-    
-    	//await this.refreshTokenDbService.addToken({email: user.email, token: authTokenSet.refreshToken })
+
+    	await this.refreshTokenService.create(
+            {
+                token: authTokenSet.refreshToken, 
+                email: user.email
+            }
+        )
 
     	return { authTokenSet, presentableUser }
     }
 
-    // async processSignUp(data: SignUpRequest): Promise<PresentableUser> {
-    // const { email, password, username, firstName, lastName } = data
+    async processSignUp(data: SignUpRequest): Promise<PresentableUser> {
+        const { email, password, firstName, lastName } = data
 
-    // 	const hashedPassword = this.cryptoService.createHashSHA256(password)
-    // 	const user = {
-    // 		email,
-    // 		password: hashedPassword, 
-    // 		username,
-    // 		firstName, 
-    // 		lastName, 
-    // 		verified: false
-    // 	}
+    	const hashedPassword = this.cryptoService.createHashSHA256(password)
+    	const user = {
+    		email,
+    		password: hashedPassword, 
+    		firstName, 
+    		lastName, 
+    		verified: false
+    	}
+        try {
+            await this.userService.create(user)
+        } catch (ex) {
+            if (ex.code === 11000 && ex.keyPattern && ex.keyValue && ex.keyValue.email) {
+                const emailError = {emailError: 'Email already exists.'}
+                throw new HttpException(emailError, HttpStatus.CONFLICT)
+            } else {
+                throw ex
+            }
+        }
+    	await this.mailerService.sendMail(email)
+    	return {
+    		email: user.email,
+    		firstName: user.firstName,
+    		lastName: user.lastName
+    	}
+    }
 
-    // 	const createdUser = await this.userDbService.createUser(user)
-    // 	const createdResult = createdUser.createResult
+    async processRefresh(refreshToken: string): Promise<AuthTokenSet> {
+    	let payload: Payload
+    	try{
+    	 	payload = await this.jwtService.verifyAsync<Payload>(
+    			refreshToken, 
+    			{ 
+    				secret: jwtConfig().secret 
+    			}
+    		)
+    	} catch (ex){
+    		throw new HttpException('The refresh token has either expired or is invalid.', HttpStatus.UNAUTHORIZED)
+    	}
 
-    // 	if (createdResult === false) {
-    // 		throw new HttpException(createdUser.errors, HttpStatus.CONFLICT)
-    // 	}
+    	const email = payload.email
 
-    // 	await this.mailerService.sendMail(email)
-    // 	return {
-    // 		email: user.email,
-    // 		username: user.username,
-    // 		firstName: user.firstName,
-    // 		lastName: user.lastName
-    // 	}
-    // }
+    	const tokenSet = await this.generateAuthTokenSet(email)
+    	await this.refreshTokenService.create({
+    		token: tokenSet.refreshToken,
+    		email
+    	}
+    	)
+    	return tokenSet
+    }
 
-    // async processRefresh(refreshToken: string): Promise<AuthTokenSet> {
-    // 	let payload: Payload
-    // 	try{
-    // 	 	payload = await this.jwtService.verifyAsync<Payload>(
-    // 			refreshToken, 
-    // 			{ 
-    // 				secret: jwtConfig().secret 
-    // 			}
-    // 		)
-    // 	} catch (ex){
-    // 		throw new HttpException('The refresh token has either expired or is invalid.', HttpStatus.UNAUTHORIZED)
-    // 	}
+    async processVerify(email: string, token: string): Promise<VerifyResponse> {
+    	try {
+    		const decoded = this.jwtService.verify<Payload>(token, { secret: jwtConfig().secret })
 
-    // 	const email = payload.email
+    		const verified = (await this.userService.findOne({email : decoded.email})).verified
 
-    // 	const tokenSet = await this.generateAuthTokenSet(email)
-    // 	await this.refreshTokenDbService.addToken({
-    // 		token: tokenSet.refreshToken,
-    // 		email
-    // 	}
-    // 	)
-    // 	return tokenSet
-    // }
+    		if (verified) {
+    			return 'already confirmed'
+    		} else {
+    			await this.userService.update(email, { verified: true })
+    			return 'success'
+    		}
 
-    // async processVerify(email: string, token: string): Promise<VerifyResponse> {
-    // 	try {
-    // 		const decoded = this.jwtService.verify<Payload>(token, { secret: jwtConfig().secret })
+    	} catch (ex) {
+    		if (ex instanceof TokenExpiredError) {
+    			return 'time out'
+    		} else {
+    			return 'not found'
+    		}
+    	}
+    }
 
-    // 		const verified = (await this.userDbService.getUser({email : decoded.email})).verified
-
-    // 		if (verified) {
-    // 			return 'already confirmed'
-    // 		} else {
-    // 			await this.userDbService.updateUser(email, { verified: true })
-    // 			return 'success'
-    // 		}
-
-    // 	} catch (ex) {
-    // 		if (ex instanceof TokenExpiredError) {
-    // 			return 'time out'
-    // 		} else {
-    // 			return 'not found'
-    // 		}
-    // 	}
-    // }
-
-    // async processInit(user: User): Promise<PresentableUser> {
-    // 	return {
-    // 		email: user.email,
-    // 		username: user.username,
-    // 		...(user.image && { image: user.image }),
-    // 		...(user.bio && { bio: user.bio }),
-    // 		firstName: user.firstName,
-    // 		lastName: user.lastName
-    // 	}
-    //}
+    async processInit(user: UserDTO): Promise<PresentableUser> {
+    	return {
+    		email: user.email,
+    		...(user.username && {username: user.username }),
+    		...(user.picture && { picture: user.picture }),
+    		...(user.bio && { bio: user.bio }),
+    		firstName: user.firstName,
+    		lastName: user.lastName
+    	}
+    }
 }
 

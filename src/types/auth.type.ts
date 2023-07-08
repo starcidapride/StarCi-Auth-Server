@@ -27,7 +27,6 @@ export type SignUpRequest = {
     email: string, 
     password: string, 
     confirm: string,
-    username: string,
     firstName: string, 
     lastName: string
 }

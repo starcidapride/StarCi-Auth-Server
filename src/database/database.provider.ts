@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose'
 import databaseConfig from '@config/database.config'
-import { DATABASE_CONNECTION } from '@utils/constants'
+import { DATABASE_CONNECTION } from '@database/constants'
 
 export const databaseProviders = [
     {

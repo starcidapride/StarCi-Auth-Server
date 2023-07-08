@@ -1,7 +1,7 @@
 import { Model } from 'mongoose'
 import { Injectable, Inject } from '@nestjs/common'
-import { USER_MODEL } from '@utils/constants'
-import { UserDTO } from './user.dto'
+import { USER_MODEL } from '@database/constants'
+import { UserDTO, UserParams } from './user.dto'
 
 @Injectable()
 export class UserService {
@@ -10,7 +10,7 @@ export class UserService {
     private UserModel: Model<UserDTO>,
     ) {}
 
-    async create(user: UserDTO): Promise<UserDTO> {
+    async create(user: UserParams): Promise<UserDTO> {
         const createdUser = new this.UserModel(user)
         return createdUser.save()
     }
@@ -30,5 +30,37 @@ export class UserService {
     ): Promise<UserDTO | null> {
         
         return this.UserModel.findOne(params).exec()
+    }
+
+    async update(
+        email: string,
+        params: Partial<{
+          password: string;
+          username: string;
+          bio: string;
+          firstName: string;
+          lastName: string;
+          image: string;
+          verified: boolean;
+        }>
+    ): Promise<UserDTO | null> {
+        try {
+            const updatedUser = await this.UserModel.findOneAndUpdate(
+                { email },
+                {
+                    ...(params?.password && { password: params.password }),
+                    ...(params?.username && { username: params.username }),
+                    ...(params?.bio && { bio: params.bio }),
+                    ...(params?.firstName && { firstName: params.firstName }),
+                    ...(params?.lastName && { lastName: params.lastName }),
+                    ...(params?.image && { picture: params.image }),
+                    ...(params?.verified && { verified: params.verified }),
+                },
+                { new: true }
+            )
+            return updatedUser
+        } catch (ex) {
+            return null
+        }
     }
 }

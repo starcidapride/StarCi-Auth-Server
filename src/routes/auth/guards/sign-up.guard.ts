@@ -23,7 +23,6 @@ export class SignUpGuard implements CanActivate {
             castedBody.email !== undefined &&
 			castedBody.password !== undefined &&
 			castedBody.confirm !== undefined &&
-			castedBody.username !== undefined &&
 			castedBody.firstName !== undefined &&
 			castedBody.lastName !== undefined
         )

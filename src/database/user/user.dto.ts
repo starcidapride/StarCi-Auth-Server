@@ -10,3 +10,14 @@ export class UserDTO extends Document {
     readonly lastName: string
     readonly verified: boolean
 }
+    
+export type UserParams = {
+    email: string
+    password: string
+    username?: string
+    picture?: string
+    bio?: string
+    firstName: string
+    lastName: string
+    verified: boolean
+}

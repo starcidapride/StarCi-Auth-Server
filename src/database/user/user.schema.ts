@@ -1,3 +1,4 @@
+import { USER } from '@database/constants'
 import * as mongoose from 'mongoose'
 
 export const UserSchema = new mongoose.Schema({
@@ -19,7 +20,7 @@ export const UserSchema = new mongoose.Schema({
     username: {
         type: String,
         unique: true,
-        sparse: true,
+        sparse: true
     },
     bio: {
         type: String,
@@ -42,4 +43,4 @@ export const UserSchema = new mongoose.Schema({
         require: true
     }
 
-}, { collection: 'User' })
+}, { collection: USER, versionKey: false })

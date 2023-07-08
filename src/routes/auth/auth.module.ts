@@ -6,9 +6,10 @@ import { CryptoService } from '@utils/sha256.service'
 import { UserService } from '@database/user/user.service'
 import { JwtService } from '@nestjs/jwt'
 import { DatabaseModule } from '@database/database.module'
-import cryptoConfig from '@config/crypto.config'
-import jwtConfig from '@config/jwt.config'
 import { LocalStrategy } from '@routes/auth/strategies/local.strategy'
+import { refreshTokenProviders } from '@database/refreshToken/refresh-token.provider'
+import { RefreshTokenService } from '@database/refreshToken/refresh-token.service'
+import { MailerService } from './mailer/mailer.service'
 
 // import { MailerService } from './mailer/mailer.service'
 
@@ -20,7 +21,11 @@ import { LocalStrategy } from '@routes/auth/strategies/local.strategy'
         UserService,
         JwtService,
         LocalStrategy,
-        ...userProviders
+        RefreshTokenService,
+        MailerService,
+
+        ...userProviders,
+        ...refreshTokenProviders
     ],
     controllers: [AuthController]
 })
