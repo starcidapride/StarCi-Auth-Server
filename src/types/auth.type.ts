@@ -38,7 +38,6 @@ export type SignUpErrors = Partial<{
     emailError: string,
     passwordError: string,
     confirmError: string,
-    usernameError: string,
     firstNameError: string,
     lastNameError: string
 }>
