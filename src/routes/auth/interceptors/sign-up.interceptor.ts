@@ -45,7 +45,7 @@ export class SignUpInterceptor implements NestInterceptor {
         }
 
         if (!isEmpty(errors)) {
-            throw new HttpException(errors, HttpStatus.BAD_REQUEST)
+            throw new HttpException({statusCode: 400, errors }, HttpStatus.BAD_REQUEST)
         }
 
         return next.handle()

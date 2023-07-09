@@ -89,7 +89,7 @@ export class AuthService {
         } catch (ex) {
             if (ex.code === 11000 && ex.keyPattern && ex.keyValue && ex.keyValue.email) {
                 const emailError = {emailError: 'Email already exists.'}
-                throw new HttpException(emailError, HttpStatus.CONFLICT)
+                throw new HttpException({statusCode: 409, errors : emailError}, HttpStatus.CONFLICT)
             } else {
                 throw ex
             }
