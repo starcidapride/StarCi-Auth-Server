@@ -1,6 +1,4 @@
 
-import { ApiProperty } from '@nestjs/swagger'
-
 export type SignInResponse = {
     authTokenSet: AuthTokenSet,
     presentableUser: PresentableUser
@@ -19,6 +17,8 @@ export type PresentableUser = {
     firstName: string,
     lastName: string
 }
+
+export type EmailType = 'verify' | 'forgetPassword'
 
 export type Payload = {
     email: string,
@@ -48,3 +48,5 @@ export type CreateUserErrors = Partial<{
     }>
 
 export type VerifyResponse = 'success' | 'time out' | 'already confirmed' | 'not found'
+
+export type ResetPasswordResponse = 'success' | 'time out' | 'not found'
