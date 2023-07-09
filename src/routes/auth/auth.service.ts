@@ -52,8 +52,10 @@ export class AuthService {
     async processSignIn(user: UserDTO): Promise<SignInResponse> {
     	const authTokenSet = await this.generateAuthTokenSet(user.email)
     	if (!user.verified) {
-    		throw new UnauthorizedException('Prior to continuing, it\'s important that you verify your account through your email. Furthermore, we have sent you another email as a backup option in case you have misplaced or cannot locate the initial email.')
-    	}
+
+            await this.mailerService.sendMail(user.email)
+    		throw new UnauthorizedException('Prior to continuing, it\'s important that you verify your account through your email. Furthermore, we have sent you another email as a backup option in case you have misplaced or cannot locate the initial email.')			
+        }
     	const presentableUser : PresentableUser = {
     		email: user.email,
     		...(user.username && { username : user.username }),

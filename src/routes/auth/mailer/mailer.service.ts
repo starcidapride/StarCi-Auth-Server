@@ -37,7 +37,7 @@ export class MailerService {
             html: `
 			<p>Dear ${email},</p>
 			<p>To complete your registration, please click on the confirmation link below:</p>
-			<a href="${serverURL}auth/verify-email?email=${email}&token=${token}">Here</a>
+			<a href="${serverURL}auth/verify?email=${email}&token=${token}">Here</a>
 			<p>If you did not sign up for StarCi, you can ignore this email.</p>
 			<p>Best regards,</p>
 			<p>Tu Cuong</p>
