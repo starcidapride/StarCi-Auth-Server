@@ -3,7 +3,7 @@ import { CryptoService } from '@utils/sha256.service'
 // import { UserDbService } from '@database/user.db.service'
 import jwtConfig from '@config/jwt.config'
 import { JwtService } from '@nestjs/jwt'
-import { AuthTokenSet, Payload, PresentableUser, SignInResponse, SignUpRequest, VerifyResponse } from '@apptypes/auth.type'
+import { AuthTokenSet, Payload, PresentableUser, ResetPasswordResponse, SignInResponse, SignUpRequest, VerifyResponse } from '@apptypes/auth.type'
 import { UserService } from '@database/user/user.service'
 import { UserDTO } from '@database/user/user.dto'
 import { RefreshTokenService } from '@database/refreshToken/refresh-token.service'
@@ -53,7 +53,7 @@ export class AuthService {
     	const authTokenSet = await this.generateAuthTokenSet(user.email)
     	if (!user.verified) {
 
-            await this.mailerService.sendMail(user.email)
+            await this.mailerService.sendMail(user.email, 'verify')
     		throw new UnauthorizedException('Prior to continuing, it\'s important that you verify your account through your email. Furthermore, we have sent you another email as a backup option in case you have misplaced or cannot locate the initial email.')			
         }
     	const presentableUser : PresentableUser = {
@@ -96,7 +96,7 @@ export class AuthService {
                 throw ex
             }
         }
-    	await this.mailerService.sendMail(email)
+    	await this.mailerService.sendMail(email, 'verify')
     	return {
     		email: user.email,
     		firstName: user.firstName,
@@ -128,9 +128,42 @@ export class AuthService {
     	return tokenSet
     }
 
-    async processVerify(email: string, token: string): Promise<VerifyResponse> {
+    async processForgetPassword(email: string) {
+
+        await this.mailerService.sendMail(email, 'forgetPassword')
+    }
+
+    async processShowResetPasswordUI(token: string): Promise<ResetPasswordResponse> {
+        try
+        {
+            this.jwtService.verify<Payload>(token, { secret: jwtConfig().secret })
+            return 'success'
+        } catch(ex){
+            if (ex instanceof TokenExpiredError) {
+    			return 'time out'
+    		} else {
+    			return 'not found'
+    		}
+        } 
+    }
+
+    async processResetPassword(username: string, newPassword: string) : Promise<PresentableUser> {
+        const updatedUser = await this.userService.update(username, {password: newPassword})
+        return {
+    		email: updatedUser.email,
+    		...(updatedUser.username && {username: updatedUser.username }),
+    		...(updatedUser.picture && { picture: updatedUser.picture }),
+    		...(updatedUser.bio && { bio: updatedUser.bio }),
+    		firstName: updatedUser.firstName,
+    		lastName: updatedUser.lastName
+    	}
+    }
+
+    async processVerify(token: string): Promise<VerifyResponse> {
     	try {
     		const decoded = this.jwtService.verify<Payload>(token, { secret: jwtConfig().secret })
+
+            const email = decoded.email
 
     		const verified = (await this.userService.findOne({email : decoded.email})).verified
 
@@ -149,6 +182,8 @@ export class AuthService {
     		}
     	}
     }
+
+
 
     async processInit(user: UserDTO): Promise<PresentableUser> {
     	return {

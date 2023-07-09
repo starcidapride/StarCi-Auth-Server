@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>RESET PASSWORD</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <h1>Reset Password</h1>
+    <p>Hello <%= email %>,</p>
+    <p>Please enter your new password below:</p>
+    <form id="resetPasswordForm" target="_self">
+        <label for="password">New Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <input type="submit" value="Reset Password">
+    </form>
+
+    <div id="successNotification" style="display: none;">
+        Password reset successful! You can now log in with your new password.
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#resetPasswordForm').submit(function(event) {
+                event.preventDefault();
+
+                const password = $('#password').val();
+
+                const url = { <%=url%> };
+                const token = { <%=token%> };
+                const data = { password };
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    data: JSON.stringify(data),
+                    success: function(response) {
+                        console.log(response)
+                        showSuccessNotification();
+                        hideResetPasswordForm();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', xhr.status);
+                    }
+                });
+            });
+
+            function showSuccessNotification() {
+                $('#successNotification').css('display', 'block');
+            }
+
+            function hideResetPasswordForm() {
+                $('#resetPasswordForm').css('display', 'none');
+            }
+        });
+    </script>
+</body>
+
+</html>

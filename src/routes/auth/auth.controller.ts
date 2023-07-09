@@ -11,6 +11,7 @@ import { Response } from 'express'
 import { RefreshGuard } from '@routes/auth/guards/refresh.guard'
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger'
 import { SignInBodyApi, SignUpRequestApi } from '@routes/auth/swagger/auth.property'
+import serverConfig from '@config/server.config'
 
 @ApiTags('Authentication')
 @Controller('api/auth')
@@ -36,11 +37,11 @@ export class AuthController {
 
     @Get('verify')
     async handleVerify(@Query('email') email: string, @Query('token') token: string, @Res() res: Response): Promise<void> {
-    	const verifyResult = await this.authService.processVerify(email, token)
+    	const verifyResult = await this.authService.processVerify(token)
     	const templates = {
-    		'success': 'success',
-    		'already confirmed': 'already-confirmed',
-    		'time out': 'time-out',
+    		'success': 'verify/success',
+    		'already confirmed': 'verify/already-confirmed',
+    		'time out': 'verify/time-out',
     		'not found': 'not-found'
     	}
 
@@ -48,6 +49,32 @@ export class AuthController {
     	res.render(templateName, { email })
 
     }
+
+    @Post('forget-password')
+    async handleForgetPassword(@Body() body: {email: string}): Promise<void> {
+        await this.authService.processForgetPassword(body.email)
+    }
+
+    @Get('show-reset-password-ui')
+    async handeShowResetPasswordUI(@Query('email') email: string, @Query('token') token: string, @Res() res: Response): Promise<void> {
+        const verifyResult =  await this.authService.processShowResetPasswordUI(token)
+        const templates = {
+    		'success': 'reset-password/success',
+    		'time out': 'reset-password/time-out',
+    		'not found': 'not-found'
+    	}
+
+        const url = `${serverConfig().serverUrl}/auth/reset-password`
+        const templateName = templates[verifyResult] || 'not-found'
+    	res.render(templateName, { email, token, url })
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('reset-password')
+    async handleResetPassword(@UserDecorator() user: UserDTO, @Body() body: {newPassword: string}): Promise<void> {
+        await this.authService.processResetPassword(user.email, body.newPassword)
+    }
+
 
     @ApiBearerAuth()
     @UseGuards(RefreshGuard)
