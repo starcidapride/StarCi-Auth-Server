@@ -20,7 +20,7 @@ export class ProfileController {
     @ApiBearerAuth()
     @ApiBody({ type: SetupProfileBodyApi })
     @UseGuards(SetupProfileGuard, JwtAuthGuard)
-    @Put('init-user-details')
+    @Put('setup-profile')
     async handleSetupProfile(@UserDecorator() user: UserDTO, @Body() body: SetupProfileRequest): Promise<PresentableUser> {
     	return await this.profileService.processSetupProfile(user.email, body.username, body.picture, body.bio)
     }
