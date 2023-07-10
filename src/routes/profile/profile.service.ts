@@ -9,7 +9,7 @@ export class ProfileService {
 		private readonly userSerivce: UserService
     ) { }
 	
-    async processInitUserDetails(email: string, username: string, picture: string, bio: string): Promise<PresentableUser>{
+    async processSetupProfile(email: string, username: string, picture: string, bio: string): Promise<PresentableUser>{
         const user = await this.userSerivce.update(email, {username, picture, bio})
         return {
             email: user.email,

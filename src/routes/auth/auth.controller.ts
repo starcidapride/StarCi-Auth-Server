@@ -75,14 +75,12 @@ export class AuthController {
         await this.authService.processResetPassword(user.email, body.newPassword)
     }
 
-
     @ApiBearerAuth()
     @UseGuards(RefreshGuard)
     @Get('refresh')
     async handleRefresh(@Headers('authorization') authHeader: string): Promise<AuthTokenSet> {
     	const refreshToken = authHeader.split(' ')[1]
     	return await this.authService.processRefresh(refreshToken)
-
     }
 
     @ApiBearerAuth()

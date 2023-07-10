@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 
-export class InitUserDetailsBodyApi{
+export class SetupProfileBodyApi{
     
 @ApiProperty({ example: 'starci', description: 'Username' })
     username: string
