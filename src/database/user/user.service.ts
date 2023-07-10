@@ -40,7 +40,7 @@ export class UserService {
           bio: string;
           firstName: string;
           lastName: string;
-          image: string;
+          picture: string;
           verified: boolean;
         }>
     ): Promise<UserDTO | null> {
@@ -53,7 +53,7 @@ export class UserService {
                     ...(params?.bio && { bio: params.bio }),
                     ...(params?.firstName && { firstName: params.firstName }),
                     ...(params?.lastName && { lastName: params.lastName }),
-                    ...(params?.image && { picture: params.image }),
+                    ...(params?.picture && { picture: params.picture }),
                     ...(params?.verified && { verified: params.verified }),
                 },
                 { new: true }
