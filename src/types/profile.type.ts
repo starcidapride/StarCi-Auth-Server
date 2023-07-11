@@ -3,3 +3,7 @@ export type SetupProfileRequest = {
     picture: string,
     bio: string
 }
+
+export type SetupProfileError = {
+    usernameError?: string
+}
