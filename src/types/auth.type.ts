@@ -20,6 +20,7 @@ export type PresentableUser = {
     deckCollection?: DeckCollection
 }
 
+
 export type EmailType = 'verify' | 'forgetPassword'
 
 export type Payload = {
