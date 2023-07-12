@@ -1,7 +1,5 @@
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler, HttpException, HttpStatus } from '@nestjs/common'
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler, BadRequestException } from '@nestjs/common'
 import { Observable } from 'rxjs'
-import { isEmpty } from 'lodash'
-import { SetupProfileError } from '@apptypes/profile.type'
 
 @Injectable()
 export class SetupProfileInterceptor implements NestInterceptor {
@@ -9,17 +7,14 @@ export class SetupProfileInterceptor implements NestInterceptor {
 
         const data = context.switchToHttp().getRequest().body
         const { username } = data
-        const error: SetupProfileError = {}
         
         const usernameRegex = /^.{6,20}$/
         if (!username.match(usernameRegex)) {
-            error.usernameError = 'Username must be between 6 and 20 characters.'
+            const error = {
+                usernameError : 'Username must be between 6 and 20 characters.'
+            }
+            throw new BadRequestException(error)
         }
-
-        if (!isEmpty(error)) {
-            throw new HttpException({statusCode: 400, error }, HttpStatus.BAD_REQUEST)
-        }
-
         return next.handle()
     }
 }

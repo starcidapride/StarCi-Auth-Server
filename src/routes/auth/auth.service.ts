@@ -1,12 +1,11 @@
-import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common'
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common'
 import { CryptoService } from '@utils/sha256.service'
 // import { UserDbService } from '@database/user.db.service'
 import jwtConfig from '@config/jwt.config'
 import { JwtService } from '@nestjs/jwt'
-import { AuthTokenSet, Payload, PresentableUser, ResetPasswordResponse, SignInResponse, SignUpRequest, VerifyResponse } from '@apptypes/auth.type'
+import { AuthTokenSet, Payload, ResetPasswordResponse, SignInResponse, SignUpRequest, VerifyResponse, PresentableUser } from '@apptypes/auth.type'
 import { UserService } from '@database/user/user.service'
 import { UserDTO } from '@database/user/user.dto'
-import { RefreshTokenService } from '@database/refreshToken/refresh-token.service'
 import { MailerService } from '@routes/auth/mailer/mailer.service'
 import {TokenExpiredError} from 'jsonwebtoken'
 
@@ -15,7 +14,6 @@ export class AuthService {
     constructor(
         private readonly jwtService: JwtService,
         private readonly userService: UserService,
-        private readonly refreshTokenService: RefreshTokenService,
         private readonly mailerService: MailerService,
         private readonly cryptoService: CryptoService
     ) { }
@@ -62,14 +60,15 @@ export class AuthService {
     		...(user.picture && { picture: user.picture }),
     		...(user.bio && { bio: user.bio }),
     		firstName: user.firstName,
-    		lastName: user.lastName
+    		lastName: user.lastName,
+            ...(user.deckCollection && { deckCollection: user.deckCollection }),
+            ...(user.refreshTokens || user.refreshTokens.length > 0 && { refreshTokens: user.refreshTokens}),
+            ...(user.deckCollection && { deckCollection: user.deckCollection })        
     	}
 
-    	await this.refreshTokenService.create(
-            {
-                token: authTokenSet.refreshToken, 
-                email: user.email
-            }
+    	await this.userService.addRefreshToken(
+            user.email,
+            authTokenSet.refreshToken,  
         )
 
     	return { authTokenSet, presentableUser }
@@ -91,7 +90,7 @@ export class AuthService {
         } catch (ex) {
             if (ex.code === 11000 && ex.keyPattern && ex.keyValue && ex.keyValue.email) {
                 const emailError = {emailError: 'Email already exists.'}
-                throw new HttpException({statusCode: 409, errors : emailError}, HttpStatus.CONFLICT)
+                throw new ConflictException({errors : emailError})
             } else {
                 throw ex
             }
@@ -100,7 +99,7 @@ export class AuthService {
     	return {
     		email: user.email,
     		firstName: user.firstName,
-    		lastName: user.lastName
+    		lastName: user.lastName,
     	}
     }
 
@@ -114,16 +113,15 @@ export class AuthService {
     			}
     		)
     	} catch (ex){
-    		throw new HttpException('The refresh token has either expired or is invalid.', HttpStatus.UNAUTHORIZED)
+    		throw new UnauthorizedException('The refresh token has either expired or is invalid.')
     	}
 
     	const email = payload.email
 
     	const tokenSet = await this.generateAuthTokenSet(email)
-    	await this.refreshTokenService.create({
-    		token: tokenSet.refreshToken,
-    		email
-    	}
+    	await this.userService.addRefreshToken(
+            email,
+    		tokenSet.refreshToken
     	)
     	return tokenSet
     }

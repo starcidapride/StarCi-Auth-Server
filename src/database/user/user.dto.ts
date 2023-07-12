@@ -1,3 +1,4 @@
+import { DeckCollection } from '@apptypes/deck.type'
 import { Document } from 'mongoose'
 
 export class UserDTO extends Document {
@@ -9,8 +10,10 @@ export class UserDTO extends Document {
     readonly firstName: string
     readonly lastName: string
     readonly verified: boolean
+    readonly refreshTokens?: string[]
+    readonly deckCollection?: DeckCollection
 }
-    
+
 export type UserParams = {
     email: string
     password: string
@@ -20,4 +23,6 @@ export type UserParams = {
     firstName: string
     lastName: string
     verified: boolean
+    refreshTokens?: string[]
+    deckCollection?: DeckCollection
 }

@@ -1,4 +1,4 @@
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler, HttpException, HttpStatus } from '@nestjs/common'
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler, BadRequestException } from '@nestjs/common'
 import { Observable } from 'rxjs'
 import { isEmpty } from 'lodash'
 import { SignUpErrors} from '@apptypes/auth.type'
@@ -45,7 +45,7 @@ export class SignUpInterceptor implements NestInterceptor {
         }
 
         if (!isEmpty(errors)) {
-            throw new HttpException({statusCode: 400, errors }, HttpStatus.BAD_REQUEST)
+            throw new BadRequestException(errors)
         }
 
         return next.handle()

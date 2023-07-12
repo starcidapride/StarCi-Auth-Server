@@ -7,6 +7,7 @@ import mailerConfig from '@config/mailer.config'
 import serverConfig from '@config/server.config'
 import databaseConfig from '@config/database.config'
 import { ProfileModule } from '@routes/profile/profile.module'
+import { DeckModule } from '@routes/deck/deck.module'
 
 @Module({
     imports: [
@@ -19,7 +20,8 @@ import { ProfileModule } from '@routes/profile/profile.module'
                 serverConfig
             ]}),
         AuthModule,
-        ProfileModule
+        ProfileModule,
+        DeckModule
     ],
     controllers: [],
     providers: [],

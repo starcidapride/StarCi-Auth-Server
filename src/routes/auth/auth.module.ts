@@ -7,8 +7,6 @@ import { UserService } from '@database/user/user.service'
 import { JwtService } from '@nestjs/jwt'
 import { DatabaseModule } from '@database/database.module'
 import { LocalStrategy } from '@routes/auth/strategies/local.strategy'
-import { refreshTokenProviders } from '@database/refreshToken/refresh-token.provider'
-import { RefreshTokenService } from '@database/refreshToken/refresh-token.service'
 import { MailerService } from './mailer/mailer.service'
 import { JwtStrategy } from './strategies/jwt.strategy'
 
@@ -23,11 +21,9 @@ import { JwtStrategy } from './strategies/jwt.strategy'
         JwtService,
         LocalStrategy,
         JwtStrategy,
-        RefreshTokenService,
         MailerService,
 
-        ...userProviders,
-        ...refreshTokenProviders
+        ...userProviders
     ],
     controllers: [AuthController]
 })

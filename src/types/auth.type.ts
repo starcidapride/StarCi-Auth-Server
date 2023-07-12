@@ -1,3 +1,4 @@
+import { DeckCollection } from '@apptypes/deck.type'
 
 export type SignInResponse = {
     authTokenSet: AuthTokenSet,
@@ -15,7 +16,9 @@ export type PresentableUser = {
     picture?: string,
     bio?: string,
     firstName: string,
-    lastName: string
+    lastName: string,
+    refreshTokens?: string[]
+    deckCollection?: DeckCollection
 }
 
 export type EmailType = 'verify' | 'forgetPassword'

@@ -1,7 +1,8 @@
-import { Model } from 'mongoose'
+import { Model, MongooseError } from 'mongoose'
 import { Injectable, Inject } from '@nestjs/common'
 import { USER_MODEL } from '@database/constants'
 import { UserDTO, UserParams } from './user.dto'
+import { Deck } from '@apptypes/deck.type'
 
 @Injectable()
 export class UserService {
@@ -48,13 +49,15 @@ export class UserService {
             const updatedUser = await this.UserModel.findOneAndUpdate(
                 { email },
                 {
-                    ...(params?.password && { password: params.password }),
-                    ...(params?.username && { username: params.username }),
-                    ...(params?.bio && { bio: params.bio }),
-                    ...(params?.firstName && { firstName: params.firstName }),
-                    ...(params?.lastName && { lastName: params.lastName }),
-                    ...(params?.picture && { picture: params.picture }),
-                    ...(params?.verified && { verified: params.verified }),
+                    $set: {
+                        ...(params?.password && { password: params.password }),
+                        ...(params?.username && { username: params.username }),
+                        ...(params?.bio && { bio: params.bio }),
+                        ...(params?.firstName && { firstName: params.firstName }),
+                        ...(params?.lastName && { lastName: params.lastName }),
+                        ...(params?.picture && { picture: params.picture }),
+                        ...(params?.verified && { verified: params.verified }),
+                    }
                 },
                 { new: true }
             )
@@ -62,5 +65,36 @@ export class UserService {
         } catch (ex) {
             return null
         }
+    }
+
+    async addDeck(email: string, deck: Deck) : Promise<UserDTO | null> {
+        const user = await this.UserModel.findOne({ email }).exec()
+
+        if (!user) {
+            return null
+        }
+
+        const deckNames = user.deckCollection.decks.map(deck => deck.deckName)
+
+        if (deckNames.includes(deck.deckName)) 
+            throw Object.assign(new MongooseError('This deck name has been existed.'), { code: 11000 })
+            
+        user.deckCollection.decks.push(deck)
+
+        const updatedUser = await user.save()
+        return updatedUser
+    }
+
+    async addRefreshToken(email: string, token: string) : Promise<UserDTO | null>{
+        const user = await this.UserModel.findOne({ email }).exec()
+
+        if (!user) {
+            return null
+        }
+
+        user.refreshTokens.push(token)
+
+        const updatedUser = await user.save()
+        return updatedUser
     }
 }
