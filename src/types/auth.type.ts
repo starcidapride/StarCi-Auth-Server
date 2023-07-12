@@ -17,7 +17,6 @@ export type PresentableUser = {
     bio?: string,
     firstName: string,
     lastName: string,
-    refreshTokens?: string[]
     deckCollection?: DeckCollection
 }
 
