@@ -68,7 +68,8 @@ export const UserSchema = new mongoose.Schema({
                         ],
                     }
                 ]
-            }),
+            }
+        ),
         require: false
     }, 
 

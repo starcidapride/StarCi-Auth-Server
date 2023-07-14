@@ -188,7 +188,8 @@ export class AuthService {
     		...(user.picture && { picture: user.picture }),
     		...(user.bio && { bio: user.bio }),
     		firstName: user.firstName,
-    		lastName: user.lastName
+    		lastName: user.lastName,
+            ...(user.deckCollection && { deckCollection: user.deckCollection }), 
     	}
     }
 }
