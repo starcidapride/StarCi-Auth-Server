@@ -9,7 +9,7 @@ import { AlterCardsRequest, Deck } from '@apptypes/deck.type'
 import { AddDeckBodyApi, AlterCardsBodyApi } from './swagger/deck.property'
 import { AddDeckGuard } from '@routes/deck/guards/add-deck.guard'
 import { AlterCardsGuard } from '@routes/deck/guards/alter-cards.guard'
-import { AlterCardInterceptor } from '@routes/deck/interceptors/alter-cards.interceptor'
+import { AlterCardsInterceptor } from '@routes/deck/interceptors/alter-cards.interceptor'
 
 @ApiTags('Deck')
 @Controller('api/deck')
@@ -29,7 +29,7 @@ export class DeckController {
     @ApiBearerAuth()
     @ApiBody({ type: AlterCardsBodyApi })
     @UseGuards(AlterCardsGuard, JwtAuthGuard)
-    @UseInterceptors(AlterCardInterceptor)
+    @UseInterceptors(AlterCardsInterceptor)
     @Put('add-play-cards')
     async handleAddPlayCards(@UserDecorator() user: UserDTO, @Body() body: AlterCardsRequest): Promise<PresentableUser> {
         return await this.deckService.processAddCards(user.email, body.deckName, 'play', body.cardNames)
@@ -38,7 +38,7 @@ export class DeckController {
     @ApiBearerAuth()
     @ApiBody({ type: AlterCardsBodyApi })
     @UseGuards(AlterCardsGuard, JwtAuthGuard)
-    @UseInterceptors(AlterCardInterceptor)
+    @UseInterceptors(AlterCardsInterceptor)
     @Put('add-character-cards')
     async handleAddCharacterCards(@UserDecorator() user: UserDTO, @Body() body: AlterCardsRequest): Promise<PresentableUser> {
         return await this.deckService.processAddCards(user.email, body.deckName, 'character', body.cardNames)
@@ -47,7 +47,7 @@ export class DeckController {
     @ApiBearerAuth()
     @ApiBody({ type: AlterCardsBodyApi })
     @UseGuards(AlterCardsGuard, JwtAuthGuard)
-    @UseInterceptors(AlterCardInterceptor)
+    @UseInterceptors(AlterCardsInterceptor)
     @Put('remove-play-cards')
     async handleRemovePlayCards(@UserDecorator() user: UserDTO, @Body() body: AlterCardsRequest): Promise<PresentableUser> {
         return await this.deckService.processRemoveCards(user.email, body.deckName, 'play', body.cardNames)
@@ -56,7 +56,7 @@ export class DeckController {
     @ApiBearerAuth()
     @ApiBody({ type: AlterCardsBodyApi })
     @UseGuards(AlterCardsGuard, JwtAuthGuard)
-    @UseInterceptors(AlterCardInterceptor)
+    @UseInterceptors(AlterCardsInterceptor)
     @Put('remove-character-cards')
     async handleRemoveCharacterCard(@UserDecorator() user: UserDTO, @Body() body: AlterCardsRequest): Promise<PresentableUser> {
         return await this.deckService.processRemoveCards(user.email, body.deckName, 'character', body.cardNames)

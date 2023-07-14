@@ -5,7 +5,7 @@ import { SignUpErrors} from '@apptypes/auth.type'
 import { cardMap } from '@utils/map'
 
 @Injectable()
-export class AlterCardInterceptor implements NestInterceptor {
+export class AlterCardsInterceptor implements NestInterceptor {
     intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
 
         const data = context.switchToHttp().getRequest().body
