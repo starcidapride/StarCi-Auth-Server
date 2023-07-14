@@ -136,6 +136,9 @@ export class UserService {
                     deck.characterDeck.splice(index, 1)
                 }
             }
+            
+            const updatedUser = await user.save()
+            return updatedUser
         }
         return null
     }
