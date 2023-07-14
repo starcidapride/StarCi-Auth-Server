@@ -1,14 +1,19 @@
-export type ComponentDeck = {
-    cardNames: string[]
-}
 
 export type Deck = {
     deckName: string,
-    playDeck: ComponentDeck,
-    characterDeck: ComponentDeck
+    playDeck: string[],
+    characterDeck: string[]
 }
 
 export type DeckCollection = {
     selectedDeckIndex: number,
     decks: Deck[]
+}
+
+export type CardType = 'character' | 'equipment' | 'spell' | 'other'
+export type ComponentDeckType = 'play'|'character';
+
+export type AlterCardRequest = {
+    deckName: string,
+    cardName: string
 }

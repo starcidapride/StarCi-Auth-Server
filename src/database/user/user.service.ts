@@ -2,7 +2,9 @@ import { Model, MongooseError } from 'mongoose'
 import { Injectable, Inject } from '@nestjs/common'
 import { USER_MODEL } from '@database/constants'
 import { UserDTO, UserParams } from './user.dto'
-import { Deck } from '@apptypes/deck.type'
+import { ComponentDeckType, Deck } from '@apptypes/deck.type'
+import { INVOCATION, MAX_CHARACTER_CARDS, MAX_CHARACTER_OCCURRENCES, MAX_INVOCATION_OCCURRENCES, MAX_PLAY_CARDS, MAX_PLAY_OCCURRENCES } from '@utils/constants'
+import { cardMap } from '@utils/map'
 
 @Injectable()
 export class UserService {
@@ -67,6 +69,77 @@ export class UserService {
         }
     }
 
+    async addCard(email: string, deckName: string, componentDeckType: ComponentDeckType, cardName: string): Promise<UserDTO | null>{
+        const user = await this.UserModel.findOne({ email }).exec()
+        const deck = user.deckCollection.decks.find(deck => deck.deckName === deckName)
+        if (deck){
+            let maxOccurrences = -1 , maxCards = - 1
+            let componentDeck: string[] = null
+
+            if (componentDeckType === 'play'){
+                maxCards = MAX_PLAY_CARDS
+                maxOccurrences = MAX_PLAY_OCCURRENCES
+
+                componentDeck = deck.playDeck
+                if (cardMap[cardName] === 'character'){
+                    throw Object.assign(new MongooseError('This card type is not accepted.'), { code: 1 })
+                } 
+            } else {
+                maxCards = MAX_CHARACTER_CARDS
+                maxOccurrences = MAX_CHARACTER_OCCURRENCES
+
+                componentDeck = deck.characterDeck
+                if (cardMap[cardName] !== 'character'){
+                    throw Object.assign(new MongooseError('This card type is not accepted.'), { code: 1 })
+                } 
+            }
+
+            const playDeck = deck.playDeck
+            if (playDeck.length === maxCards){
+                throw Object.assign(new MongooseError('This deck has reached the limit.'), { code: 2 })
+            }
+               
+            const occurrences = playDeck.filter(card => card === cardName).length
+            if (cardName === INVOCATION && occurrences == MAX_INVOCATION_OCCURRENCES){
+                throw Object.assign(new MongooseError('This card has reached the max occurrences.'), { code: 3 })
+            } else if (occurrences == maxOccurrences){
+                throw Object.assign(new MongooseError('This card has reached the max occurrences.'), { code: 3 })
+            }
+
+            componentDeck.push(cardName)
+            
+            const updatedUser = await user.save()
+            return updatedUser
+        }      
+        return null
+    }
+
+    async removeCard(email: string, deckName: string, componentDeckType: ComponentDeckType, cardName: string): Promise<UserDTO | null>{
+        const user = await this.UserModel.findOne({ email }).exec()
+        const deck = user.deckCollection.decks.find(deck => deck.deckName === deckName)
+        if (deck){
+            if (componentDeckType === 'play'){
+                if (!deck.playDeck.find(_cardName => _cardName === cardName)){
+                    throw Object.assign(new MongooseError('This card is not existed.'), { code: 4 })
+                }
+                
+                const index = deck.playDeck.indexOf(cardName)
+                if (index !== -1) {
+                    deck.playDeck.splice(index, 1)
+                }
+            } else {
+                if (!deck.characterDeck.find(_cardName => _cardName === cardName)){
+                    throw Object.assign(new MongooseError('This card is not existed.'), { code: 4 })
+                }
+                const index = deck.characterDeck.indexOf(cardName)
+                if (index !== -1) {
+                    deck.characterDeck.splice(index, 1)
+                }
+            }
+        }
+        return null
+    }
+
     async addDeck(email: string, deck: Deck) : Promise<UserDTO | null> {
         const user = await this.UserModel.findOne({ email }).exec()
 
@@ -81,7 +154,7 @@ export class UserService {
             
         user.deckCollection.decks.push(deck)
         user.deckCollection.selectedDeckIndex = user.deckCollection.decks.length
-        
+
         const updatedUser = await user.save()
         return updatedUser
     }

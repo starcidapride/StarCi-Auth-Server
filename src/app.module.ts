@@ -17,7 +17,7 @@ import { DeckModule } from '@routes/deck/deck.module'
                 jwtConfig,
                 mailerConfig,
                 databaseConfig,
-                serverConfig
+                serverConfig,
             ]}),
         AuthModule,
         ProfileModule,

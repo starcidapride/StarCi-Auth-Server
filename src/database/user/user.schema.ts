@@ -52,20 +52,14 @@ export const UserSchema = new mongoose.Schema({
                             type: String,
                             required: true,
                         },
-                        playDeck: [{
-                            cardName: {
-                                type: String,
-                                required: true,
-                            },
-                        }
-                        ],
-                        characterDeck: [{
-                            cardName: {
-                                type: String,
-                                required: true,
-                            },
-                        }
-                        ],
+                        playDeck: {
+                            type: [String],
+                            required: true,
+                        },
+                        characterDeck: {
+                            type: [String],
+                            required: true,
+                        },
                     }
                 ]
             }

@@ -1,4 +1,3 @@
-import { ComponentDeck } from '@apptypes/deck.type'
 import { ApiProperty } from '@nestjs/swagger'
 
 export class AddDeckBodyApi{
@@ -7,10 +6,19 @@ export class AddDeckBodyApi{
     deckName: string
 
 @ApiProperty({ example: '["Heal", "Fafnir\'s Talon"]', description: 'Play Deck' })
-    playDeck: ComponentDeck
+    playDeck: string[]
 
 @ApiProperty({ example: '["Tel \' Annas "]', description: 'Character Deck' })
-    characterDeck: ComponentDeck
+    characterDeck: string[]
+}
+
+export class AlterCardBodyApi{
+    
+    @ApiProperty({ example: 'starci', description: 'DeckName' })
+        deckName: string
+    
+    @ApiProperty({ example: 'Krixi', description: 'Card Name' })
+        cardName: string
 }
 
 
