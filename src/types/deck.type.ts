@@ -13,7 +13,7 @@ export type DeckCollection = {
 export type CardType = 'character' | 'equipment' | 'spell' | 'other'
 export type ComponentDeckType = 'play'|'character';
 
-export type AlterCardRequest = {
+export type AlterCardsRequest = {
     deckName: string,
-    cardName: string
+    cardNames: string[]
 }

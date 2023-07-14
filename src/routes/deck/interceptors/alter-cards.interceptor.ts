@@ -13,7 +13,7 @@ export class AlterCardInterceptor implements NestInterceptor {
         const errors: SignUpErrors = {}
         
         if (!cardMap[cardName]){
-            throw new NotFoundException('This card name is not existed.')
+            throw new NotFoundException(`Card ${cardName} not available.`)
         }
 
         if (!isEmpty(errors)) {

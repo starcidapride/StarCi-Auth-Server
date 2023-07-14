@@ -12,13 +12,13 @@ export class AddDeckBodyApi{
     characterDeck: string[]
 }
 
-export class AlterCardBodyApi{
+export class AlterCardsBodyApi{
     
     @ApiProperty({ example: 'starci', description: 'DeckName' })
         deckName: string
     
-    @ApiProperty({ example: 'Krixi', description: 'Card Name' })
-        cardName: string
+    @ApiProperty({ example: ['Krixi', 'Yorn'], description: 'Card Names' })
+        cardNames: string[]
 }
 
 

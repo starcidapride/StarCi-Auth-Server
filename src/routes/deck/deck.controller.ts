@@ -5,11 +5,11 @@ import { PresentableUser } from '@apptypes/auth.type'
 import { JwtAuthGuard } from '@routes/auth/guards/jwt.guard'
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger'
 import { DeckService } from '@routes/deck/deck.service'
-import { AlterCardRequest, Deck } from '@apptypes/deck.type'
-import { AlterCardBodyApi, AddDeckBodyApi } from './swagger/deck.property'
+import { AlterCardsRequest, Deck } from '@apptypes/deck.type'
+import { AddDeckBodyApi, AlterCardsBodyApi } from './swagger/deck.property'
 import { AddDeckGuard } from '@routes/deck/guards/add-deck.guard'
-import { AlterCardGuard } from '@routes/deck/guards/alter-card-guard'
-import { AlterCardInterceptor } from '@routes/deck/interceptors/alter-card.interceptor'
+import { AlterCardsGuard } from '@routes/deck/guards/alter-cards.guard'
+import { AlterCardInterceptor } from '@routes/deck/interceptors/alter-cards.interceptor'
 
 @ApiTags('Deck')
 @Controller('api/deck')
@@ -27,40 +27,41 @@ export class DeckController {
     }
 
     @ApiBearerAuth()
-    @ApiBody({ type: AlterCardBodyApi })
-    @UseGuards(AlterCardGuard, JwtAuthGuard)
+    @ApiBody({ type: AlterCardsBodyApi })
+    @UseGuards(AlterCardsGuard, JwtAuthGuard)
     @UseInterceptors(AlterCardInterceptor)
-    @Put('add-play-card')
-    async handleAddPlayCard(@UserDecorator() user: UserDTO, @Body() body: AlterCardRequest): Promise<PresentableUser> {
-        return await this.deckService.processAddCard(user.email, body.deckName, 'play', body.cardName)
+    @Put('add-play-cards')
+    async handleAddPlayCards(@UserDecorator() user: UserDTO, @Body() body: AlterCardsRequest): Promise<PresentableUser> {
+        return await this.deckService.processAddCards(user.email, body.deckName, 'play', body.cardNames)
     }
 
     @ApiBearerAuth()
-    @ApiBody({ type: AlterCardBodyApi })
-    @UseGuards(AlterCardGuard, JwtAuthGuard)
+    @ApiBody({ type: AlterCardsBodyApi })
+    @UseGuards(AlterCardsGuard, JwtAuthGuard)
     @UseInterceptors(AlterCardInterceptor)
-    @Put('add-character-card')
-    async handleAddCharacterCard(@UserDecorator() user: UserDTO, @Body() body: AlterCardRequest): Promise<PresentableUser> {
-        return await this.deckService.processAddCard(user.email, body.deckName, 'character', body.cardName)
+    @Put('add-character-cards')
+    async handleAddCharacterCards(@UserDecorator() user: UserDTO, @Body() body: AlterCardsRequest): Promise<PresentableUser> {
+        return await this.deckService.processAddCards(user.email, body.deckName, 'character', body.cardNames)
     }
 
     @ApiBearerAuth()
-    @ApiBody({ type: AlterCardBodyApi })
-    @UseGuards(AlterCardGuard, JwtAuthGuard)
+    @ApiBody({ type: AlterCardsBodyApi })
+    @UseGuards(AlterCardsGuard, JwtAuthGuard)
     @UseInterceptors(AlterCardInterceptor)
-    @Put('remove-play-card')
-    async handleRemovePlayCard(@UserDecorator() user: UserDTO, @Body() body: AlterCardRequest): Promise<PresentableUser> {
-        return await this.deckService.processRemoveCard(user.email, body.deckName, 'play', body.cardName)
+    @Put('remove-play-cards')
+    async handleRemovePlayCards(@UserDecorator() user: UserDTO, @Body() body: AlterCardsRequest): Promise<PresentableUser> {
+        return await this.deckService.processRemoveCards(user.email, body.deckName, 'play', body.cardNames)
     }
 
     @ApiBearerAuth()
-    @ApiBody({ type: AlterCardBodyApi })
-    @UseGuards(AlterCardGuard, JwtAuthGuard)
+    @ApiBody({ type: AlterCardsBodyApi })
+    @UseGuards(AlterCardsGuard, JwtAuthGuard)
     @UseInterceptors(AlterCardInterceptor)
-    @Put('remove-character-card')
-    async handleRemoveCharacterCard(@UserDecorator() user: UserDTO, @Body() body: AlterCardRequest): Promise<PresentableUser> {
-        return await this.deckService.processRemoveCard(user.email, body.deckName, 'character', body.cardName)
+    @Put('remove-character-cards')
+    async handleRemoveCharacterCard(@UserDecorator() user: UserDTO, @Body() body: AlterCardsRequest): Promise<PresentableUser> {
+        return await this.deckService.processRemoveCards(user.email, body.deckName, 'character', body.cardNames)
     }
 
 
 }
+

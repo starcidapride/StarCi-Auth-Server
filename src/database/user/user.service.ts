@@ -69,10 +69,12 @@ export class UserService {
         }
     }
 
-    async addCard(email: string, deckName: string, componentDeckType: ComponentDeckType, cardName: string): Promise<UserDTO | null>{
+    async addCards(email: string, deckName: string, componentDeckType: ComponentDeckType, cardNames: string[]): Promise<UserDTO | null>{
         const user = await this.UserModel.findOne({ email }).exec()
         const deck = user.deckCollection.decks.find(deck => deck.deckName === deckName)
+        
         if (deck){
+
             let maxOccurrences = -1 , maxCards = - 1
             let componentDeck: string[] = null
 
@@ -81,32 +83,42 @@ export class UserService {
                 maxOccurrences = MAX_PLAY_OCCURRENCES
 
                 componentDeck = deck.playDeck
-                if (cardMap[cardName] === 'character'){
-                    throw Object.assign(new MongooseError('This card type is not accepted.'), { code: 1 })
-                } 
+                for (const cardName in cardNames){
+                    if (cardMap[cardName] === 'character'){
+                        throw Object.assign(new MongooseError(`Card "${cardName}" is not accepted.`), { code: 1 }, { cardName })
+                    } 
+                }
+               
             } else {
                 maxCards = MAX_CHARACTER_CARDS
                 maxOccurrences = MAX_CHARACTER_OCCURRENCES
 
                 componentDeck = deck.characterDeck
-                if (cardMap[cardName] !== 'character'){
-                    throw Object.assign(new MongooseError('This card type is not accepted.'), { code: 1 })
-                } 
+                for (const cardName in cardNames){
+                    if (cardMap[cardName] !== 'character'){
+                        throw Object.assign(new MongooseError(`Card "${cardName}" is not accepted.`), { code: 1 }, { cardName })
+                    } 
+                }
             }
 
+            
             const playDeck = deck.playDeck
-            if (playDeck.length === maxCards){
+            if (playDeck.length + cardNames.length > maxCards){
                 throw Object.assign(new MongooseError('This deck has reached the limit.'), { code: 2 })
             }
-               
-            const occurrences = playDeck.filter(card => card === cardName).length
-            if (cardName === INVOCATION && occurrences == MAX_INVOCATION_OCCURRENCES){
-                throw Object.assign(new MongooseError('This card has reached the max occurrences.'), { code: 3 })
-            } else if (occurrences == maxOccurrences){
-                throw Object.assign(new MongooseError('This card has reached the max occurrences.'), { code: 3 })
+              
+            for (const cardName in cardNames){
+                const occurrences = playDeck.filter(card => card === cardName).length
+                if (cardName === INVOCATION && occurrences == MAX_INVOCATION_OCCURRENCES){
+                    throw Object.assign(new MongooseError(`Card "${cardName}" has reached the max occurrences.`), { code: 3 }, { cardName })
+                } else if (occurrences == maxOccurrences){
+                    throw Object.assign(new MongooseError(`Card "${cardName}" has reached the max occurrences.`), { code: 3 }, { cardName })
+                }
             }
 
-            componentDeck.push(cardName)
+            for (const cardName in cardNames){
+                componentDeck.push(cardName)
+            }
             
             const updatedUser = await user.save()
             return updatedUser
@@ -114,25 +126,24 @@ export class UserService {
         return null
     }
 
-    async removeCard(email: string, deckName: string, componentDeckType: ComponentDeckType, cardName: string): Promise<UserDTO | null>{
+    async removeCards(email: string, deckName: string, componentDeckType: ComponentDeckType, cardNames: string[]): Promise<UserDTO | null>{
         const user = await this.UserModel.findOne({ email }).exec()
         const deck = user.deckCollection.decks.find(deck => deck.deckName === deckName)
         if (deck){
             if (componentDeckType === 'play'){
-                if (!deck.playDeck.find(_cardName => _cardName === cardName)){
-                    throw Object.assign(new MongooseError('This card is not existed.'), { code: 4 })
-                }
-                
-                const index = deck.playDeck.indexOf(cardName)
-                if (index !== -1) {
+                for (const cardName in cardNames){
+                    if (!deck.playDeck.find(_cardName => _cardName === cardName)){
+                        throw Object.assign(new MongooseError(`Card ${cardName} is not existed.`), { code: 4 }, { cardName })
+                    }            
+                    const index = deck.playDeck.indexOf(cardName)
                     deck.playDeck.splice(index, 1)
                 }
             } else {
-                if (!deck.characterDeck.find(_cardName => _cardName === cardName)){
-                    throw Object.assign(new MongooseError('This card is not existed.'), { code: 4 })
-                }
-                const index = deck.characterDeck.indexOf(cardName)
-                if (index !== -1) {
+                for (const cardName in cardNames){
+                    if (!deck.characterDeck.find(_cardName => _cardName === cardName)){
+                        throw Object.assign(new MongooseError(`Card ${cardName} is not existed.`), { code: 4 }, { cardName })
+                    }
+                    const index = deck.characterDeck.indexOf(cardName)
                     deck.characterDeck.splice(index, 1)
                 }
             }

@@ -33,10 +33,10 @@ export class DeckService {
         }
     }
 
-    async processAddCard(email: string, deckName: string, componentDeckType: ComponentDeckType, cardName: string) : Promise<PresentableUser> {
+    async processAddCards(email: string, deckName: string, componentDeckType: ComponentDeckType, cardNames: string[]) : Promise<PresentableUser> {
         try
         {
-            const user = await this.userSerivce.addCard(email, deckName, componentDeckType, cardName)
+            const user = await this.userSerivce.addCards(email, deckName, componentDeckType, cardNames)
             if (user === null){
                 throw new NotFoundException('This deck is not existed.')
             }
@@ -53,19 +53,19 @@ export class DeckService {
 
         } catch(ex){
             if (ex.code === 1){
-                throw new ConflictException('This card type is not accepted.')
+                throw new NotFoundException(`Card "${ex.cardName}" is not accepted.`)
             } else if (ex.code === 2){
-                throw new ConflictException('This card type is not accepted.')
+                throw new ConflictException('This deck has reached the limit.')
             } else if (ex.code === 3){
-                throw new ConflictException('This card has reached the max occurrences.')
+                throw new ConflictException(`Card "${ex.cardName}" has reached the max occurrences.`)
             }
         }
     }
 
-    async processRemoveCard(email: string, deckName: string, componentDeckType: ComponentDeckType, cardName: string) : Promise<PresentableUser> {
+    async processRemoveCards(email: string, deckName: string, componentDeckType: ComponentDeckType, cardNames: string[]) : Promise<PresentableUser> {
         try
         {
-            const user = await this.userSerivce.addCard(email, deckName, componentDeckType, cardName)
+            const user = await this.userSerivce.addCards(email, deckName, componentDeckType, cardNames)
             if (user === null){
                 throw new NotFoundException('This deck is not existed.')
             }
@@ -82,9 +82,10 @@ export class DeckService {
 
         } catch(ex){
             if (ex.code === 4){
-                throw new NotFoundException('This card is not existed in deck.')
+                throw new NotFoundException(`Card ${ex.cardName} is not existed.`)
             } 
         }
     }
 }
+
 
