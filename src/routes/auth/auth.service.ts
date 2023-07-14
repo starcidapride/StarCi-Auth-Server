@@ -61,9 +61,7 @@ export class AuthService {
     		...(user.bio && { bio: user.bio }),
     		firstName: user.firstName,
     		lastName: user.lastName,
-            ...(user.deckCollection && { deckCollection: user.deckCollection }),
-            ...(user.refreshTokens || user.refreshTokens.length > 0 && { refreshTokens: user.refreshTokens}),
-            ...(user.deckCollection && { deckCollection: user.deckCollection })        
+            ...(user.deckCollection && { deckCollection: user.deckCollection }),  
     	}
 
     	await this.userService.addRefreshToken(

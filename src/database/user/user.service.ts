@@ -80,7 +80,8 @@ export class UserService {
             throw Object.assign(new MongooseError('This deck name has been existed.'), { code: 11000 })
             
         user.deckCollection.decks.push(deck)
-
+        user.deckCollection.selectedDeckIndex = user.deckCollection.decks.length
+        
         const updatedUser = await user.save()
         return updatedUser
     }
