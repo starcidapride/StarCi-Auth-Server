@@ -16,7 +16,7 @@ export const CRESHT = 'Cresht'
 
 export const PEURA = 'Peura'
 
-export const TELS_ANNAS = 'Tel\'s Annas'
+export const TEL_ANNAS = 'Tel\'Annas'
 
 export const FAFNIRS_TALON = 'Fafnir\'s Talon'
 
