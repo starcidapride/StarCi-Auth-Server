@@ -10,7 +10,7 @@ export enum UserServiceErrorCodes{
     DECK_NO_EXISTED,
     DECK_EXISTED,
     CARD_NO_ACCEPTED,
-    DECK_REACTED_THE_LIMIT,
+    DECK_REACHED_THE_LIMIT,
     CARD_MAX_OCCURRENCES,
     DECK_EMPTY,
     CARD_NO_EXISTED
@@ -142,7 +142,7 @@ export class UserService {
 
             
             if (componentDeck.length + cardNames.length > maxCards){
-                throw Object.assign( { errorType: UserServiceErrorCodes.DECK_REACTED_THE_LIMIT } )
+                throw Object.assign( { errorType: UserServiceErrorCodes.DECK_REACHED_THE_LIMIT } )
             }
               
             for (const cardName of cardNames){

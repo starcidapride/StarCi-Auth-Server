@@ -61,7 +61,7 @@ export class DeckService {
             else if (ex.errorType === UserServiceErrorCodes.CARD_NO_ACCEPTED){
                 throw new NotFoundException(`Card ${ex.cardName} is not accepted.`)
             } 
-            else if (ex.errorType === UserServiceErrorCodes.DECK_REACTED_THE_LIMIT){
+            else if (ex.errorType === UserServiceErrorCodes.DECK_REACHED_THE_LIMIT){
                 throw new ConflictException('This deck has reached the limit.')
             } 
             else if (ex.errorType === UserServiceErrorCodes.CARD_MAX_OCCURRENCES){
