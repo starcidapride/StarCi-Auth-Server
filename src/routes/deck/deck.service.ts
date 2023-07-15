@@ -69,6 +69,29 @@ export class DeckService {
             } 
         }
     }
+
+    async proccessAlterSelectedDeck(email: string, selectedDeckIndex: number) : Promise<PresentableUser>{
+        try
+        {
+            const user = await this.userSerivce.alterSelectedDeck(email, selectedDeckIndex)
+
+            return {
+                email: user.email,
+                username : user.username, 
+                picture: user.picture,
+                bio: user.bio,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                deckCollection: user.deckCollection
+            }
+
+        } catch(ex){
+            if (ex.errorType === UserServiceErrorCodes.INDEX_OUT_OF_RANGE){
+                throw new NotFoundException('This selected deck index is out of range.')
+            }
+            
+        }
+    }
 }
 
 

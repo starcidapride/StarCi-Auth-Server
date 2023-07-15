@@ -23,3 +23,7 @@ export type SaveDeckRequest = {
     characterCardNames: string[]
 }
 
+export type AlterSelectedDeckRequest = {
+    selectedDeckIndex: number
+}
+

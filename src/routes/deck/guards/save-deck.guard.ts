@@ -1,6 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
 import { Observable } from 'rxjs'
-import { SignUpRequest } from '@apptypes/auth.type'
 import { SaveDeckRequest } from '@apptypes/deck.type'
 
 @Injectable()
@@ -9,16 +8,16 @@ export class SaveDeckGuard implements CanActivate {
         context: ExecutionContext,
     ): boolean | Promise<boolean> | Observable<boolean> {
         const request = context.switchToHttp().getRequest()
-        const body: unknown | SignUpRequest = request.body
+        const body: unknown | SaveDeckRequest = request.body
 
-        if (this.isAlterCardsRequest(body)) {
+        if (this.isSaveDeckRequest(body)) {
             return true
         }
 
         return false
     }
 
-    private isAlterCardsRequest(body: unknown): body is SaveDeckRequest {
+    private isSaveDeckRequest(body: unknown): body is SaveDeckRequest {
         const castedBody = body as SaveDeckRequest
         return (
             castedBody.deckName !== undefined &&

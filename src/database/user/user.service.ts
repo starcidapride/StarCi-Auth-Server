@@ -11,7 +11,8 @@ export enum UserServiceErrorCodes{
     DECK_EXISTED,
     CARD_NOT_ACCEPTED,
     COMPONENT_DECK_REACHED_LIMIT,
-    CARD_MAX_OCCURRENCES
+    CARD_MAX_OCCURRENCES,
+    INDEX_OUT_OF_RANGE
 }
 
 @Injectable()
@@ -155,6 +156,23 @@ export class UserService {
         }
 
         user.refreshTokens.push(token)
+
+        const updatedUser = await user.save()
+        return updatedUser
+    }
+
+    async alterSelectedDeck(email: string, selectedDeckIndex: number): Promise<UserDTO | null>{
+        const user = await this.UserModel.findOne({ email }).exec()
+
+        if (!user) {
+            return null
+        }
+
+        if (selectedDeckIndex > user.deckCollection.decks.length - 1 || selectedDeckIndex < 0){
+            throw Object.assign({ errorType: UserServiceErrorCodes.INDEX_OUT_OF_RANGE })
+        }
+
+        user.deckCollection.selectedDeckIndex = selectedDeckIndex
 
         const updatedUser = await user.save()
         return updatedUser

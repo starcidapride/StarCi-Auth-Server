@@ -8,7 +8,6 @@ import { SignUpInterceptor } from '@routes/auth/interceptors/sign-up.interceptor
 import { SignUpGuard } from '@routes/auth/guards/sign-up.guard'
 import { JwtAuthGuard } from '@routes/auth/guards/jwt.guard'
 import { Response } from 'express' 
-import { RefreshGuard } from '@routes/auth/guards/refresh.guard'
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger'
 import { SignInBodyApi, SignUpRequestApi } from '@routes/auth/swagger/auth.property'
 import serverConfig from '@config/server.config'
@@ -76,7 +75,7 @@ export class AuthController {
     }
 
     @ApiBearerAuth()
-    @UseGuards(RefreshGuard)
+    @UseGuards(JwtAuthGuard)
     @Get('refresh')
     async handleRefresh(@Headers('authorization') authHeader: string): Promise<AuthTokenSet> {
     	const refreshToken = authHeader.split(' ')[1]

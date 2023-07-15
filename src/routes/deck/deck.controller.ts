@@ -5,11 +5,12 @@ import { PresentableUser } from '@apptypes/auth.type'
 import { JwtAuthGuard } from '@routes/auth/guards/jwt.guard'
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger'
 import { DeckService } from '@routes/deck/deck.service'
-import { AddDeckRequest, SaveDeckRequest } from '@apptypes/deck.type'
-import { AddDeckBodyApi, SaveDeckBodyApi } from './swagger/deck.property'
+import { AddDeckRequest, AlterSelectedDeckRequest, SaveDeckRequest } from '@apptypes/deck.type'
+import { AddDeckBodyApi, AlterSelectedDeckBodyApi, SaveDeckBodyApi } from './swagger/deck.property'
 import { AddDeckGuard } from '@routes/deck/guards/add-deck.guard'
 import { SaveDeckGuard } from '@routes/deck/guards/save-deck.guard'
 import { SaveDeckInterceptor } from '@routes/deck/interceptors/save-deck.interceptor'
+import { AlterSelectedDeckGuard } from './guards/alter-selected-deck.guard'
 
 @ApiTags('Deck')
 @Controller('api/deck')
@@ -33,6 +34,14 @@ export class DeckController {
     @Put('save-deck')
     async handleSaveDeck(@UserDecorator() user: UserDTO, @Body() body: SaveDeckRequest): Promise<PresentableUser> {
         return await this.deckService.processSaveDeck(user.email, body.deckName, body.playCardNames, body.characterCardNames)
+    }
+
+    @ApiBearerAuth()
+    @ApiBody({ type: AlterSelectedDeckBodyApi })
+    @UseGuards(AlterSelectedDeckGuard, JwtAuthGuard)
+    @Put('alter-selected-deck')
+    async handleAlterSelectedDeck(@UserDecorator() user: UserDTO, @Body() body: AlterSelectedDeckRequest): Promise<PresentableUser> {
+        return await this.deckService.proccessAlterSelectedDeck(user.email, body.selectedDeckIndex)
     }
 }
 

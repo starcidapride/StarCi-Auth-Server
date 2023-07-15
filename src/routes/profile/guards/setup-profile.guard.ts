@@ -1,6 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
 import { Observable } from 'rxjs'
-import { SignUpRequest } from '@apptypes/auth.type'
 import { SetupProfileRequest } from '@apptypes/profile.type'
 
 @Injectable()
@@ -9,7 +8,7 @@ export class SetupProfileGuard implements CanActivate {
         context: ExecutionContext,
     ): boolean | Promise<boolean> | Observable<boolean> {
         const request = context.switchToHttp().getRequest()
-        const body : unknown | SignUpRequest = request.body
+        const body : unknown | SetupProfileGuard = request.body
 
         if (this.isSetupProfileRequest(body)) {
             return true
