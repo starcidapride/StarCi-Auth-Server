@@ -113,15 +113,11 @@ export class UserService {
         const deck = user.deckCollection.decks.find(deck => deck.deckName === deckName)
         
         if (deck){
-
-            let maxOccurrences = -1 , maxCards = - 1
-            let componentDeck: string[] = null
+            const maxCards = componentDeckType === 'play' ? MAX_PLAY_CARDS : MAX_CHARACTER_CARDS    
+            const maxOccurrences = componentDeckType === 'play' ? MAX_PLAY_OCCURRENCES : MAX_CHARACTER_OCCURRENCES          
+            const componentDeck = componentDeckType === 'play' ? deck.playDeck : deck.characterDeck
 
             if (componentDeckType === 'play'){
-                maxCards = MAX_PLAY_CARDS
-                maxOccurrences = MAX_PLAY_OCCURRENCES
-
-                componentDeck = deck.playDeck
                 for (const cardName of cardNames){
                     if (cardMap[cardName] === 'character'){
                         throw Object.assign(  { errorType: UserServiceErrorCodes.CARD_NO_ACCEPTED }, { cardName })
@@ -129,18 +125,13 @@ export class UserService {
                 }
                
             } else {
-                maxCards = MAX_CHARACTER_CARDS
-                maxOccurrences = MAX_CHARACTER_OCCURRENCES
-
-                componentDeck = deck.characterDeck
                 for (const cardName of cardNames){
                     if (cardMap[cardName] !== 'character'){
                         throw Object.assign( { errorType: UserServiceErrorCodes.CARD_NO_ACCEPTED }, { cardName })
                     } 
                 }
             }
-
-            
+      
             if (componentDeck.length + cardNames.length > maxCards){
                 throw Object.assign( { errorType: UserServiceErrorCodes.DECK_REACHED_THE_LIMIT } )
             }
@@ -165,15 +156,8 @@ export class UserService {
         const deck = user.deckCollection.decks.find(deck => deck.deckName === deckName)
         if (deck){
 
-            let componentDeck: string[] = null
-
-            if (componentDeckType === 'play'){
-                componentDeck = deck.playDeck
-
-            } else {
-                componentDeck = deck.characterDeck
-            }
-
+            const componentDeck = componentDeckType === 'play' ? deck.playDeck : deck.characterDeck
+            
             if (componentDeck.length === 0){
                 throw Object.assign( { errorType: UserServiceErrorCodes.DECK_EMPTY } )
             }
