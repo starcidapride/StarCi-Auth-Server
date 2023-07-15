@@ -59,13 +59,13 @@ export class DeckService {
                 throw new NotFoundException('This deck is not existed.')
             }
             else if (ex.errorType === UserServiceErrorCodes.CARD_NOT_ACCEPTED){
-                throw new NotFoundException(`Card ${ex.cardName} is not accepted.`)
+                throw new NotFoundException(`Card '${ex.cardName}' is not accepted.`)
             } 
             else if (ex.errorType === UserServiceErrorCodes.COMPONENT_DECK_REACHED_LIMIT){
-                throw new ConflictException(`This ${ex.componentDeckType} deck has reached the limit.`)
+                throw new ConflictException(`This '${ex.componentDeckType}' deck has reached the limit.`)
             } 
             else if (ex.errorType === UserServiceErrorCodes.CARD_MAX_OCCURRENCES){
-                throw new ConflictException(`Card ${ex.cardName} has reached the max occurrences.`)
+                throw new ConflictException(`Card '${ex.cardName}' has reached the max occurrences.`)
             } 
         }
     }
