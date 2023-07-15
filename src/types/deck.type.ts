@@ -11,12 +11,15 @@ export type DeckCollection = {
 }
 
 export type CardType = 'character' | 'equipment' | 'spell' | 'other'
-export type ComponentDeckType = 'play'|'character';
+
 
 export type AddDeckRequest = {
     deckName: string
 }
-export type AlterCardsRequest = {
+
+export type SaveDeckRequest = {
     deckName: string,
-    cardNames: string[]
+    playCardNames: string[]
+    characterCardNames: string[]
 }
+
