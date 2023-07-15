@@ -5,12 +5,12 @@ import { PresentableUser } from '@apptypes/auth.type'
 import { JwtAuthGuard } from '@routes/auth/guards/jwt.guard'
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger'
 import { DeckService } from '@routes/deck/deck.service'
-import { AddDeckRequest, AlterSelectedDeckRequest, SaveDeckRequest } from '@apptypes/deck.type'
-import { AddDeckBodyApi, AlterSelectedDeckBodyApi, SaveDeckBodyApi } from './swagger/deck.property'
+import { AddDeckRequest, DefaultDeckRequest, SaveDeckRequest } from '@apptypes/deck.type'
+import { AddDeckBodyApi, DefaultDeckBodyApi, SaveDeckBodyApi } from './swagger/deck.property'
 import { AddDeckGuard } from '@routes/deck/guards/add-deck.guard'
 import { SaveDeckGuard } from '@routes/deck/guards/save-deck.guard'
 import { SaveDeckInterceptor } from '@routes/deck/interceptors/save-deck.interceptor'
-import { AlterSelectedDeckGuard } from './guards/alter-selected-deck.guard'
+import { DefaultDeckGuard } from './guards/default-deck.guard'
 
 @ApiTags('Deck')
 @Controller('api/deck')
@@ -37,11 +37,11 @@ export class DeckController {
     }
 
     @ApiBearerAuth()
-    @ApiBody({ type: AlterSelectedDeckBodyApi })
-    @UseGuards(AlterSelectedDeckGuard, JwtAuthGuard)
-    @Put('alter-selected-deck')
-    async handleAlterSelectedDeck(@UserDecorator() user: UserDTO, @Body() body: AlterSelectedDeckRequest): Promise<PresentableUser> {
-        return await this.deckService.proccessAlterSelectedDeck(user.email, body.selectedDeckIndex)
+    @ApiBody({ type: DefaultDeckBodyApi })
+    @UseGuards(DefaultDeckGuard, JwtAuthGuard)
+    @Put('default-deck')
+    async handleDefaultDeck(@UserDecorator() user: UserDTO, @Body() body: DefaultDeckRequest): Promise<PresentableUser> {
+        return await this.deckService.processDefaultDeck(user.email, body.defaultDeckIndex)
     }
 }
 

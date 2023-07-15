@@ -70,10 +70,10 @@ export class DeckService {
         }
     }
 
-    async proccessAlterSelectedDeck(email: string, selectedDeckIndex: number) : Promise<PresentableUser>{
+    async processDefaultDeck(email: string, selectedDeckIndex: number) : Promise<PresentableUser>{
         try
         {
-            const user = await this.userSerivce.alterSelectedDeck(email, selectedDeckIndex)
+            const user = await this.userSerivce.defaultDeck(email, selectedDeckIndex)
 
             return {
                 email: user.email,

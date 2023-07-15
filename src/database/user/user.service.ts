@@ -161,7 +161,7 @@ export class UserService {
         return updatedUser
     }
 
-    async alterSelectedDeck(email: string, selectedDeckIndex: number): Promise<UserDTO | null>{
+    async defaultDeck(email: string, selectedDeckIndex: number): Promise<UserDTO | null>{
         const user = await this.UserModel.findOne({ email }).exec()
 
         if (!user) {

@@ -18,10 +18,10 @@ export class SaveDeckBodyApi{
         characterCardNames: string[]
 }
 
-export class AlterSelectedDeckBodyApi{
+export class DefaultDeckBodyApi{
     
-    @ApiProperty({ example: 1, description: 'Selected Deck Index' })
-        selectedDeckIndex: string
+    @ApiProperty({ example: 1, description: 'Default Deck Index' })
+        defaultDeckIndex: number
 }
 
 
