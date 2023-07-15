@@ -5,7 +5,7 @@ import { PresentableUser } from '@apptypes/auth.type'
 import { JwtAuthGuard } from '@routes/auth/guards/jwt.guard'
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger'
 import { DeckService } from '@routes/deck/deck.service'
-import { AlterCardsRequest, Deck } from '@apptypes/deck.type'
+import { AddDeckRequest, AlterCardsRequest } from '@apptypes/deck.type'
 import { AddDeckBodyApi, AlterCardsBodyApi } from './swagger/deck.property'
 import { AddDeckGuard } from '@routes/deck/guards/add-deck.guard'
 import { AlterCardsGuard } from '@routes/deck/guards/alter-cards.guard'
@@ -22,8 +22,8 @@ export class DeckController {
     @ApiBody({ type: AddDeckBodyApi })
     @UseGuards(AddDeckGuard, JwtAuthGuard)
     @Put('add-deck')
-    async handleAddDeck(@UserDecorator() user: UserDTO, @Body() body: Deck): Promise<PresentableUser> {
-        return await this.deckService.processAddDeck(user.email, body)
+    async handleAddDeck(@UserDecorator() user: UserDTO, @Body() body: AddDeckRequest): Promise<PresentableUser> {
+        return await this.deckService.processAddDeck(user.email, body.deckName)
     }
 
     @ApiBearerAuth()

@@ -10,9 +10,15 @@ export class DeckService {
 		private readonly userSerivce: UserService
     ) { }
 	
-    async processAddDeck(email: string, deck : Deck) : Promise<PresentableUser> {
+    async processAddDeck(email: string, deckName : string) : Promise<PresentableUser> {
         try
         {
+            const deck: Deck = {
+                deckName,
+                playDeck: [],
+                characterDeck: []
+            }
+
             const user = await this.userSerivce.addDeck(email, deck)
             
             return {
@@ -26,7 +32,7 @@ export class DeckService {
             }
 
         } catch(ex){
-            if (ex.code === 11000){
+            if (ex.code === 0){
                 const error = {deckNameError: 'This deck name has been existed.'}
                 throw new ConflictException(error)
             }
@@ -37,9 +43,6 @@ export class DeckService {
         try
         {
             const user = await this.userSerivce.addCards(email, deckName, componentDeckType, cardNames)
-            if (user === null){
-                throw new NotFoundException('This deck is not existed.')
-            }
 
             return {
                 email: user.email,
@@ -53,22 +56,26 @@ export class DeckService {
 
         } catch(ex){
             if (ex.code === 1){
-                throw new NotFoundException(`Card "${ex.cardName}" is not accepted.`)
-            } else if (ex.code === 2){
-                throw new ConflictException('This deck has reached the limit.')
-            } else if (ex.code === 3){
-                throw new ConflictException(`Card "${ex.cardName}" has reached the max occurrences.`)
+                throw new NotFoundException('This deck is not existed.')
             }
+            else if (ex.code === 2){
+                throw new NotFoundException(`Card ${ex.cardName} is not accepted.`)
+            } 
+            else if (ex.code === 3){
+                throw new ConflictException('This deck has reached the limit.')
+            } 
+            else if (ex.code === 4){
+                throw new ConflictException(`Card ${ex.cardName} has reached the max occurrences.`)
+            } 
+
+
         }
     }
 
     async processRemoveCards(email: string, deckName: string, componentDeckType: ComponentDeckType, cardNames: string[]) : Promise<PresentableUser> {
         try
         {
-            const user = await this.userSerivce.addCards(email, deckName, componentDeckType, cardNames)
-            if (user === null){
-                throw new NotFoundException('This deck is not existed.')
-            }
+            const user = await this.userSerivce.removeCards(email, deckName, componentDeckType, cardNames)
 
             return {
                 email: user.email,
@@ -81,9 +88,15 @@ export class DeckService {
             }
 
         } catch(ex){
-            if (ex.code === 4){
-                throw new NotFoundException(`Card ${ex.cardName} is not existed.`)
+            if (ex.code === 1){
+                throw new NotFoundException('This deck is not existed.')
+            }
+            else if (ex.code === 5){
+                throw new NotFoundException(`This ${componentDeckType} deck is empty.`)
             } 
+            else if (ex.code === 6){
+                throw new NotFoundException(`Card ${ex.cardName} is not existed.`)
+            }
         }
     }
 }

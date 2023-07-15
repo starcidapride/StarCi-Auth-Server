@@ -9,13 +9,17 @@ export class AlterCardsInterceptor implements NestInterceptor {
     intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
 
         const data = context.switchToHttp().getRequest().body
-        const { cardName } = data
+        const { cardNames } = data
         const errors: SignUpErrors = {}
         
-        if (!cardMap[cardName]){
-            throw new NotFoundException(`Card ${cardName} not available.`)
-        }
+       
 
+        for (const cardName of cardNames){
+            if (!cardMap[cardName]){
+                throw new NotFoundException(`Card ${cardName} is not available.`)
+            }
+        }
+        
         if (!isEmpty(errors)) {
             throw new BadRequestException(errors)
         }

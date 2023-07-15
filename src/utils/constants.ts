@@ -6,7 +6,7 @@ export const MAX_PLAY_OCCURRENCES = 3
 
 export const MAX_INVOCATION_OCCURRENCES = 6
 
-export const MAX_CHARACTER_OCCURRENCES = 3
+export const MAX_CHARACTER_OCCURRENCES = 1
 
 export const ARTHUR = 'Arthur'
 

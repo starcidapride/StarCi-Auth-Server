@@ -1,4 +1,4 @@
-import { USER } from '@database/constants'
+import { USER } from '@database/database-constants'
 import mongoose from 'mongoose'
 
 export const UserSchema = new mongoose.Schema({

@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
 import { Observable } from 'rxjs'
 import { SignUpRequest } from '@apptypes/auth.type'
-import { Deck } from '@apptypes/deck.type'
+import { AddDeckRequest } from '@apptypes/deck.type'
 
 @Injectable()
 export class AddDeckGuard implements CanActivate {
@@ -18,12 +18,10 @@ export class AddDeckGuard implements CanActivate {
         return false
     }
 
-    private isAddDeckRequest(body: unknown): body is Deck {
-        const castedBody = body as Deck
+    private isAddDeckRequest(body: unknown): body is AddDeckRequest {
+        const castedBody = body as AddDeckRequest
         return (
-            castedBody.deckName !== undefined &&
-			castedBody.playDeck !== undefined &&
-			castedBody.characterDeck !== undefined
+            castedBody.deckName !== undefined
         )
     }
 }
