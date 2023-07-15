@@ -6,6 +6,16 @@ import { ComponentDeckType, Deck, DeckCollection } from '@apptypes/deck.type'
 import { INVOCATION, MAX_CHARACTER_CARDS, MAX_CHARACTER_OCCURRENCES, MAX_INVOCATION_OCCURRENCES, MAX_PLAY_CARDS, MAX_PLAY_OCCURRENCES } from '@utils/constants'
 import { cardMap } from '@utils/map'
 
+export enum UserServiceErrorCodes{
+    DECK_NO_EXISTED,
+    DECK_EXISTED,
+    CARD_NO_ACCEPTED,
+    DECK_REACTED_THE_LIMIT,
+    CARD_MAX_OCCURRENCES,
+    DECK_EMPTY,
+    CARD_NO_EXISTED
+}
+
 @Injectable()
 export class UserService {
     constructor(
@@ -89,7 +99,7 @@ export class UserService {
         const deckNames = user.deckCollection.decks.map(deck => deck.deckName)
 
         if (deckNames.includes(deck.deckName)) 
-            throw Object.assign(new MongooseError('This deck name has been existed.'), { code: 0 })
+            throw Object.assign( { errorType: UserServiceErrorCodes.DECK_EXISTED })
             
         user.deckCollection.decks.push(deck)
         user.deckCollection.selectedDeckIndex = user.deckCollection.decks.length - 1
@@ -114,7 +124,7 @@ export class UserService {
                 componentDeck = deck.playDeck
                 for (const cardName of cardNames){
                     if (cardMap[cardName] === 'character'){
-                        throw Object.assign(new MongooseError(`Card "${cardName}" is not accepted.`), { code: 1 }, { cardName })
+                        throw Object.assign(  { errorType: UserServiceErrorCodes.CARD_NO_ACCEPTED }, { cardName })
                     } 
                 }
                
@@ -125,20 +135,20 @@ export class UserService {
                 componentDeck = deck.characterDeck
                 for (const cardName of cardNames){
                     if (cardMap[cardName] !== 'character'){
-                        throw Object.assign(new MongooseError(`Card ${cardName} is not accepted.`), { code: 2 }, { cardName })
+                        throw Object.assign( { errorType: UserServiceErrorCodes.CARD_NO_ACCEPTED }, { cardName })
                     } 
                 }
             }
 
             
             if (componentDeck.length + cardNames.length > maxCards){
-                throw Object.assign(new MongooseError('This deck has reached the limit.'), { code: 3 })
+                throw Object.assign( { errorType: UserServiceErrorCodes.DECK_REACTED_THE_LIMIT } )
             }
               
             for (const cardName of cardNames){
                 const occurrences = componentDeck.filter(card => card === cardName).length
                 if (occurrences >= (cardName === INVOCATION ? MAX_INVOCATION_OCCURRENCES : maxOccurrences)){
-                    throw Object.assign(new MongooseError(`Card ${cardName} has reached the max occurrences.`), { code: 4 }, { cardName })
+                    throw Object.assign({ errorType: UserServiceErrorCodes.CARD_MAX_OCCURRENCES }, { cardName })
                 }
                 componentDeck.push(cardName)
             }
@@ -146,7 +156,7 @@ export class UserService {
             const updatedUser = await user.save()
             return updatedUser
         } else {
-            throw Object.assign(new MongooseError('This deck is not existed.'), { code: 1 })
+            throw Object.assign( { errorType: UserServiceErrorCodes.DECK_NO_EXISTED})
         } 
     }
 
@@ -165,12 +175,12 @@ export class UserService {
             }
 
             if (componentDeck.length === 0){
-                throw Object.assign(new MongooseError(`This ${componentDeckType} deck is empty.`), { code: 5 })
+                throw Object.assign( { errorType: UserServiceErrorCodes.DECK_EMPTY } )
             }
 
             for (const cardName of cardNames){
                 if (!componentDeck.find(_cardName => _cardName === cardName)){
-                    throw Object.assign(new MongooseError(`Card ${cardName} is not existed.`), { code: 6 }, { cardName })
+                    throw Object.assign({ errorType: UserServiceErrorCodes.CARD_NO_EXISTED }, { cardName })
                 }            
                 const index = componentDeck.indexOf(cardName)
                 componentDeck.splice(index, 1)
@@ -179,7 +189,7 @@ export class UserService {
             const updatedUser = await user.save()
             return updatedUser
         }
-        throw Object.assign(new MongooseError('This deck is not existed.'), { code: 1 })
+        throw Object.assign(new MongooseError('This deck is not existed.'), { errorType: 1 })
     }
 
     async addRefreshToken(email: string, token: string) : Promise<UserDTO | null>{

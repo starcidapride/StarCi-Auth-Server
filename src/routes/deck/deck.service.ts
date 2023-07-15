@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common'
 
-import { UserService } from '@database/user/user.service'
+import { UserService, UserServiceErrorCodes } from '@database/user/user.service'
 import { ComponentDeckType, Deck } from '@apptypes/deck.type'
 import { PresentableUser } from '@apptypes/auth.type'
 
@@ -32,7 +32,7 @@ export class DeckService {
             }
 
         } catch(ex){
-            if (ex.code === 0){
+            if (ex.errorType === UserServiceErrorCodes.DECK_EXISTED){
                 const error = {deckNameError: 'This deck name has been existed.'}
                 throw new ConflictException(error)
             }
@@ -55,20 +55,18 @@ export class DeckService {
             }
 
         } catch(ex){
-            if (ex.code === 1){
+            if (ex.errorType === UserServiceErrorCodes.DECK_NO_EXISTED){
                 throw new NotFoundException('This deck is not existed.')
             }
-            else if (ex.code === 2){
+            else if (ex.errorType === UserServiceErrorCodes.CARD_NO_ACCEPTED){
                 throw new NotFoundException(`Card ${ex.cardName} is not accepted.`)
             } 
-            else if (ex.code === 3){
+            else if (ex.errorType === UserServiceErrorCodes.DECK_REACTED_THE_LIMIT){
                 throw new ConflictException('This deck has reached the limit.')
             } 
-            else if (ex.code === 4){
+            else if (ex.errorType === UserServiceErrorCodes.CARD_MAX_OCCURRENCES){
                 throw new ConflictException(`Card ${ex.cardName} has reached the max occurrences.`)
             } 
-
-
         }
     }
 
@@ -88,13 +86,13 @@ export class DeckService {
             }
 
         } catch(ex){
-            if (ex.code === 1){
+            if (ex.errorType === UserServiceErrorCodes.DECK_NO_EXISTED){
                 throw new NotFoundException('This deck is not existed.')
             }
-            else if (ex.code === 5){
+            else if (ex.errorType === UserServiceErrorCodes.DECK_EMPTY){
                 throw new NotFoundException(`This ${componentDeckType} deck is empty.`)
             } 
-            else if (ex.code === 6){
+            else if (ex.errorType === UserServiceErrorCodes.CARD_NO_EXISTED){
                 throw new NotFoundException(`Card ${ex.cardName} is not existed.`)
             }
         }
