@@ -117,19 +117,12 @@ export class UserService {
             const maxOccurrences = componentDeckType === 'play' ? MAX_PLAY_OCCURRENCES : MAX_CHARACTER_OCCURRENCES          
             const componentDeck = componentDeckType === 'play' ? deck.playDeck : deck.characterDeck
 
-            if (componentDeckType === 'play'){
-                for (const cardName of cardNames){
-                    if (cardMap[cardName] === 'character'){
-                        throw Object.assign(  { errorType: UserServiceErrorCodes.CARD_NO_ACCEPTED }, { cardName })
-                    } 
-                }
-               
-            } else {
-                for (const cardName of cardNames){
-                    if (cardMap[cardName] !== 'character'){
-                        throw Object.assign( { errorType: UserServiceErrorCodes.CARD_NO_ACCEPTED }, { cardName })
-                    } 
-                }
+            for (const cardName of cardNames){
+                if (!(componentDeckType === 'play' && cardMap[cardName] === 'character')
+                     || !(componentDeckType !== 'play' && cardMap[cardName] !== 'character')
+                ){
+                    throw Object.assign(  { errorType: UserServiceErrorCodes.CARD_NO_ACCEPTED }, { cardName })
+                } 
             }
       
             if (componentDeck.length + cardNames.length > maxCards){
@@ -157,7 +150,7 @@ export class UserService {
         if (deck){
 
             const componentDeck = componentDeckType === 'play' ? deck.playDeck : deck.characterDeck
-            
+
             if (componentDeck.length === 0){
                 throw Object.assign( { errorType: UserServiceErrorCodes.DECK_EMPTY } )
             }
