@@ -87,7 +87,7 @@ export class DeckService {
 
         } catch(ex){
             if (ex.errorType === UserServiceErrorCodes.INDEX_OUT_OF_RANGE){
-                throw new NotFoundException('This selected deck index is out of range.')
+                throw new ConflictException('This selected deck index is out of range.')
             }
             
         }
