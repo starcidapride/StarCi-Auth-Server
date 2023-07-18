@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger'
+import {  ApiProperty } from '@nestjs/swagger'
 
 export class SetupProfileBodyApi{
     
@@ -11,5 +11,3 @@ export class SetupProfileBodyApi{
 @ApiProperty({ example: 'A passionate developer', description: 'Bio' })
     bio: string
 }
-
-
